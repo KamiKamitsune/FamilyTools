@@ -7,6 +7,9 @@ var sql = builder.AddSqlServer("FamilyTools", port: 14329)
     .WithLifetime(ContainerLifetime.Persistent)
     .AddDatabase("easycompta");
 
+var backgroundService = builder.AddProject<Projects.FamilyTools_BackgroundService>("BackgroundService");
+
+
 var migration = builder.AddProject<Projects.FamilyTools_MigrationService>("migrations")
     .WithReference(sql)
         .WaitFor(sql);
@@ -16,6 +19,7 @@ var easyComptaAPI = builder
     .WithReference(sql)
     .WithReference(migration)
     .WaitForCompletion(migration)
+    .WithReference(backgroundService)
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile();
 
@@ -25,5 +29,6 @@ builder.AddNpmApp("webfrontend", "../FamilyTools.Web")
     .WithHttpEndpoint(env: "PORT")
     .WithExternalHttpEndpoints()
     .PublishAsDockerFile();
+
 
 builder.Build().Run();

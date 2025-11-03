@@ -18,9 +18,9 @@ namespace FamilyTools.EasyCompta.Controllers
         {
             try
             {
-                await this.business.ImportCSVFile(csvFile);
+                var result = this.business.ImportCSVFile(csvFile);
 
-                return this.Ok(new { message = "Fichier reçu" });
+                return this.Ok(new { message = $"Fichier reçu et {result}" });
             }
             catch (Exception ex)
             {

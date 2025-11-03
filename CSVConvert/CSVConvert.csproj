@@ -1,21 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-FamilyTools.MigrationService-88b3673c-4615-48de-a811-42e84a3a4417</UserSecretsId>
+    <UserSecretsId>dotnet-CSVConvert-a2f9eff3-6cd1-4602-9742-c6a3c30e1bea</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.5.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FamilyTools.ServiceDefaults\FamilyTools.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\FamilyTools.Data\FamilyTools.Data.csproj" />
   </ItemGroup>
 </Project>

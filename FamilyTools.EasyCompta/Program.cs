@@ -16,8 +16,6 @@ builder.Services.AddScoped<IAccountPageBusiness, AccountPageBusiness>();
 builder.Services.AddScoped<IAccountLineBusiness, AccountLineBusiness>();
 builder.Services.AddScoped<IImportCSVBusiness, ImportCSVBusiness>();
 
-
-
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

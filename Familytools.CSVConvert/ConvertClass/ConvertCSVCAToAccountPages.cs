@@ -1,48 +1,59 @@
-﻿using System.Globalization;
+﻿
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+
 
 using CsvHelper;
 using CsvHelper.Configuration;
 
-using FamilyTools.CSVConvert;
+using FamilyTools.CSVConvert.Interface;
 using FamilyTools.Data.Models.EasyCompta;
-using FamilyTools.EasyCompta.IBusiness;
+using FamilyTools.EasyCompta.Business;
 
-namespace FamilyTools.EasyCompta.Business
+using Microsoft.AspNetCore.Http;
+
+namespace FamilyTools.CSVConvert
 {
-    public partial class ImportCSVBusiness(
-        IAccountPageBusiness accountPageBusiness, 
-        IUserBusiness userBusiness, 
-        IAccountTagBusiness accountTagBusiness, 
-        ILogger<ImportCSVBusiness> logger,
-        IBackgroundTaskQueue taskQueue) : IImportCSVBusiness
+    public partial class ConvertCSVCAToAccountPages(
+        ILogger<ConvertCSVCAToAccountPages> logger, 
+        AccountTagBusiness accountTagBusiness, 
+        UserBusiness userBusiness,
+        AccountPageBusiness accountPageBusiness) 
+        : IConvertCSVCAToAccountPages
     {
-        private readonly IAccountPageBusiness _accountPageBusiness = accountPageBusiness;
-        private readonly IUserBusiness _userBusiness = userBusiness;
-        private readonly IAccountTagBusiness _accountTagBusiness = accountTagBusiness;
-        private readonly ILogger<ImportCSVBusiness> _logger = logger;
-        private readonly IBackgroundTaskQueue _taskQueue = taskQueue;
+        private readonly ILogger<ConvertCSVCAToAccountPages> _logger = logger;
+
+        private readonly AccountTagBusiness _accountTagBusiness = accountTagBusiness;
+        private readonly UserBusiness _userBusiness = userBusiness;
+        private readonly AccountPageBusiness _accountPageBusiness = accountPageBusiness;
+
 
         private string _csvContent = "";
         private List<CSVCA> _csvCAs = [];
         private List<AccountEnter> _accountEnters = [];
 
-        public string ImportCSVFile(IFormFile csvFile) {
-            if (csvFile == null) return "Fichier vide";
-            this._taskQueue.QueueBackgroundWorkItemAsync(async token =>
-            {
-                await this.CSVToAccountPages(csvFile);
-            });
-            return "fichier en liste d'attente";
-        }
+        private CancellationToken _cancellationToken;
 
-        private async Task CSVToAccountPages(IFormFile csvFile)
+        public async Task ConvertCSVFile(IFormFile csvFile, CancellationToken cancellationToken)
         {
+            if (csvFile == null) return;
+
+            this._cancellationToken = cancellationToken;
+
+            if (this._cancellationToken.IsCancellationRequested) return;
             await this.ReadCSV(csvFile);
+
+            if (this._cancellationToken.IsCancellationRequested) return;
             this.CleanCSVContent();
+
+            if (this._cancellationToken.IsCancellationRequested) return;
             await this.ConvertCSVToCSVCA();
+
+            if (this._cancellationToken.IsCancellationRequested) return;
             await this.ChangeInAccountEnter();
+
+            if (this._cancellationToken.IsCancellationRequested) return;
             await this.PostToBusiness();
         }
 
@@ -52,10 +63,14 @@ namespace FamilyTools.EasyCompta.Business
                  .Select(x => new Tuple<int, int, List<AccountEnter>>(x.Key.Year, x.Key.Month, [.. x]))
                  .ToList();
 
-            //TODO: Créer des account page par rapport au mois et a l'année si elle n'existe pas, sinon les ajoutées à des pages existanteC
+            //TODO: Créer des account page par rapport au mois et a l'année si elle n'existe pas, sinon les ajoutées à des pages existante (create or update dans la page business?)
             List<AccountPage> pages = [];
             foreach (var accountEnter in accountEnterGroupByMouthAndYear)
             {
+                if (this._cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
                 pages.Add(new AccountPage(accountEnter.Item3, new DateOnly(accountEnter.Item1, accountEnter.Item2, 1)));
             }
 
@@ -65,9 +80,11 @@ namespace FamilyTools.EasyCompta.Business
 
         private async Task ChangeInAccountEnter()
         {
-            var defaultTag = await this._accountTagBusiness.DefaultTag() ?? new AccountTag(); 
+            var defaultTag = await this._accountTagBusiness.DefaultTag() ?? new AccountTag();
             foreach (var csvca in _csvCAs)
             {
+                if (this._cancellationToken.IsCancellationRequested) return;
+
                 float totalValue = 0;
                 totalValue += csvca.Credit;
                 totalValue += csvca.Debit;
@@ -78,7 +95,8 @@ namespace FamilyTools.EasyCompta.Business
 
                 foreach (var user in users)
                 {
-                    lines.Add(new AccountLine() {
+                    lines.Add(new AccountLine()
+                    {
                         Name = $"{csvca.Libelle}_{DateOnly.FromDateTime(csvca.Date)}",
                         User = user,
                         Value = totalValue / users.Count,
@@ -117,6 +135,8 @@ namespace FamilyTools.EasyCompta.Business
 
                 while (await r.ReadAsync())
                 {
+                    if (this._cancellationToken.IsCancellationRequested) return;
+
                     try
                     {
                         // Vérifier qu'on a assez de champs
@@ -192,6 +212,8 @@ namespace FamilyTools.EasyCompta.Business
 
             foreach (var line in lines)
             {
+                if (this._cancellationToken.IsCancellationRequested) return;
+
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
                 var cleanLine = line.Trim();
@@ -231,7 +253,7 @@ namespace FamilyTools.EasyCompta.Business
         [GeneratedRegex(@"\s+")]
         private static partial Regex CleanDescriptionRegex();
 
-    private DateTime ParseDate(string dateStr)
+        private DateTime ParseDate(string dateStr)
         {
             if (string.IsNullOrWhiteSpace(dateStr)) return DateTime.MinValue;
 
@@ -271,5 +293,5 @@ namespace FamilyTools.EasyCompta.Business
 
             return 0;
         }
-    } 
+    }
 }

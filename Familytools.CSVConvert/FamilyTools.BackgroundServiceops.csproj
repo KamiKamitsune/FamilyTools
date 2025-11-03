@@ -4,17 +4,18 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-FamilyTools.MigrationService-88b3673c-4615-48de-a811-42e84a3a4417</UserSecretsId>
+    <UserSecretsId>dotnet-Familytools.CSVConvert-994e6283-3740-42e3-9731-5cbab38d5fa6</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Microsoft.EntityFrameworkCore.SqlServer" Version="9.5.2" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FamilyTools.EasyCompta\FamilyTools.EasyCompta.csproj" />
     <ProjectReference Include="..\FamilyTools.ServiceDefaults\FamilyTools.ServiceDefaults.csproj" />
     <ProjectReference Include="..\FamilyTools.Data\FamilyTools.Data.csproj" />
   </ItemGroup>

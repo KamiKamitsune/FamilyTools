@@ -10,7 +10,8 @@ namespace FamilyTools.MigrationService;
 public class Worker(
     ILogger<Worker> logger,
     IServiceProvider serviceProvider,
-    IHostApplicationLifetime hostApplicationLifetime) : BackgroundService
+    IHostApplicationLifetime hostApplicationLifetime
+    ) : BackgroundService
 {
     public const string ActivitySourceName = "Migrations";
     private static readonly ActivitySource s_activitySource = new(ActivitySourceName);
