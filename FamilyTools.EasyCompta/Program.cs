@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
+using FamilyTools.Data.Context;
 using FamilyTools.EasyCompta.Business;
 using FamilyTools.EasyCompta.IBusiness;
-using FamilyTools.Data.Context;
+using FamilyTools.EasyCompta.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddSqlServerDbContext<EasyComptaContext>("easycompta");
@@ -15,6 +18,27 @@ builder.Services.AddScoped<IAccountTagBusiness, AccountTagBusiness>();
 builder.Services.AddScoped<IAccountPageBusiness, AccountPageBusiness>();
 builder.Services.AddScoped<IAccountLineBusiness, AccountLineBusiness>();
 builder.Services.AddScoped<IImportCSVBusiness, ImportCSVBusiness>();
+
+builder.Services.AddHostedService<CSVConvertService>();
+builder.Services.AddSingleton<IBackgroundCSVConvert>(_ =>
+{
+    if (!int.TryParse(builder.Configuration["QueueCapacity"], out var queueCapacity))
+    {
+        queueCapacity = 100;
+    }
+
+    return new DefaultBackgroundTaskQueue(queueCapacity);
+});
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Ignore les cycles au lieu de throw
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+
+        // Optionnel: rendre le JSON plus lisible
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

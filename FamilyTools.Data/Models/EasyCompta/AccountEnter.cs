@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace FamilyTools.Data.Models.EasyCompta
 {
@@ -11,6 +12,8 @@ namespace FamilyTools.Data.Models.EasyCompta
         public float TotalValue { get; set; }
         public DateOnly Date { get; set; }
         public int PageId { get; set; }
+
+        [JsonIgnore]
         public AccountPage Page { get; set; } = null!;
 
         public AccountEnter()

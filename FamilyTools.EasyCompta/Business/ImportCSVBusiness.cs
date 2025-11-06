@@ -1,43 +1,52 @@
-﻿using System.Globalization;
-using System.Text;
-using System.Text.RegularExpressions;
-
-using CsvHelper;
-using CsvHelper.Configuration;
-
-using FamilyTools.CSVConvert;
-using FamilyTools.Data.Models.EasyCompta;
-using FamilyTools.EasyCompta.IBusiness;
-
-namespace FamilyTools.EasyCompta.Business
+﻿namespace FamilyTools.EasyCompta.Business
 {
+    using System.Globalization;
+    using System.Text;
+    using System.Text.RegularExpressions;
+
+    using CsvHelper;
+    using CsvHelper.Configuration;
+
+    using FamilyTools.Data.Models.EasyCompta;
+    using FamilyTools.EasyCompta.IBusiness;
+    using FamilyTools.EasyCompta.Services;
+
     public partial class ImportCSVBusiness(
         IAccountPageBusiness accountPageBusiness, 
         IUserBusiness userBusiness, 
         IAccountTagBusiness accountTagBusiness, 
         ILogger<ImportCSVBusiness> logger,
-        IBackgroundTaskQueue taskQueue) : IImportCSVBusiness
+        IBackgroundCSVConvert taskQueue) : IImportCSVBusiness
     {
+        private readonly IBackgroundCSVConvert _taskQueue = taskQueue;
         private readonly IAccountPageBusiness _accountPageBusiness = accountPageBusiness;
         private readonly IUserBusiness _userBusiness = userBusiness;
         private readonly IAccountTagBusiness _accountTagBusiness = accountTagBusiness;
         private readonly ILogger<ImportCSVBusiness> _logger = logger;
-        private readonly IBackgroundTaskQueue _taskQueue = taskQueue;
 
         private string _csvContent = "";
         private List<CSVCA> _csvCAs = [];
         private List<AccountEnter> _accountEnters = [];
 
-        public string ImportCSVFile(IFormFile csvFile) {
-            if (csvFile == null) return "Fichier vide";
-            this._taskQueue.QueueBackgroundWorkItemAsync(async token =>
+        public async Task<bool> ImportCSVFile(IFormFile csvFile) {
+
+            if (csvFile == null || csvFile.Length == 0)
+                return false;
+
+            // 🔹 On copie le contenu du fichier dans un MemoryStream
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
             {
-                await this.CSVToAccountPages(csvFile);
-            });
-            return "fichier en liste d'attente";
+                await csvFile.CopyToAsync(ms);
+                fileBytes = ms.ToArray();
+            }
+
+            await this._taskQueue.AddWorkItemInQueueBackgroundAsync(fileBytes);
+
+            return true;
         }
 
-        private async Task CSVToAccountPages(IFormFile csvFile)
+        public async Task CSVToAccountPages(byte[] csvFile)
         {
             await this.ReadCSV(csvFile);
             this.CleanCSVContent();
@@ -52,7 +61,7 @@ namespace FamilyTools.EasyCompta.Business
                  .Select(x => new Tuple<int, int, List<AccountEnter>>(x.Key.Year, x.Key.Month, [.. x]))
                  .ToList();
 
-            //TODO: Créer des account page par rapport au mois et a l'année si elle n'existe pas, sinon les ajoutées à des pages existanteC
+            //TODO: Créer des account page par rapport au mois et a l'année si elle n'existe pas, sinon les ajoutées à des pages existante
             List<AccountPage> pages = [];
             foreach (var accountEnter in accountEnterGroupByMouthAndYear)
             {
@@ -156,9 +165,9 @@ namespace FamilyTools.EasyCompta.Business
 
         }
 
-        private async Task ReadCSV(IFormFile csvFile)
+        private async Task ReadCSV(byte[] csvFile)
         {
-            using var stream = csvFile.OpenReadStream();
+            using var stream = new MemoryStream(csvFile);
             using var reader = new StreamReader(stream, Encoding.GetEncoding("Windows-1252"));
             this._csvContent = await reader.ReadToEndAsync();
         }

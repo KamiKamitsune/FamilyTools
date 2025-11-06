@@ -3,6 +3,7 @@ namespace FamilyTools.EasyCompta.IBusiness
 {
     public interface IImportCSVBusiness
     {
-        string ImportCSVFile(IFormFile csvFile);
+        Task CSVToAccountPages(byte[] csvFile);
+        Task<bool> ImportCSVFile(IFormFile csvFile);
     }
 }
