@@ -11,6 +11,8 @@
     using FamilyTools.EasyCompta.IBusiness;
     using FamilyTools.EasyCompta.Services;
 
+    using static FamilyTools.Data.Models.EasyCompta.EnumEasycompta;
+
     public partial class ImportCSVBusiness(
         IAccountPageBusiness accountPageBusiness, 
         IUserBusiness userBusiness, 
@@ -78,7 +80,7 @@
             foreach (var csvca in _csvCAs)
             {
                 float totalValue = 0;
-                totalValue += csvca.Credit;
+                totalValue -= csvca.Credit;
                 totalValue += csvca.Debit;
 
                 var users = await this._userBusiness.UserList();
@@ -94,7 +96,7 @@
                     });
                 }
 
-                _accountEnters.Add(new AccountEnter(csvca.Libelle, DateOnly.FromDateTime(csvca.Date), totalValue, lines, defaultTag));
+                _accountEnters.Add(new AccountEnter(csvca.Libelle, csvca.OperationType, DateOnly.FromDateTime(csvca.Date), totalValue, lines, defaultTag));
             }
         }
 
@@ -119,7 +121,11 @@
                     TrimOptions = TrimOptions.Trim,
                     // Permettre les champs avec des guillemets
                     Quote = '"',
-                    Escape = '"'
+                    Escape = '"',
+                    // IMPORTANT: Permettre les champs multi-lignes
+                    DetectDelimiter = false,
+                    LineBreakInQuotedFieldIsBadData = false, // Crucial !
+                    Mode = CsvMode.RFC4180 // Mode standard qui gère les multi-lignes
                 };
 
                 using var r = new CsvReader(reader, config);
@@ -135,12 +141,30 @@
                             continue;
                         }
 
+                        var dateStr = r.GetField(0)?.Trim();
+                        var libelle = r.GetField(1)?.Trim();
+                        var debitStr = r.GetField(2)?.Trim();
+                        //var creditStr = r.Parser.Count > 3 ? r.GetField(3)?.Trim() : "";
+                        var creditStr = r.GetField(3)?.Trim();
+
+
+                        // Nettoyer le libellé des espaces multiples et sauts de ligne
+                        if (!string.IsNullOrEmpty(libelle))
+                        {
+                            libelle = Regex.Replace(libelle, @"\s+", " ").Trim();
+                        }
+
+                        // Extraire le type
+                        var type = ExtractOperationType(libelle);
+
+                        libelle = CleanLibelle(libelle);
                         var csvca = new CSVCA
                         {
-                            Date = ParseDate(r.GetField(0)),
-                            Libelle = CleanDescription(r.GetField(1)),
-                            Debit = ParseAmount(r.GetField(2)),
-                            Credit = r.Parser.Count > 3 ? ParseAmount(r.GetField(3)) : 0
+                            Date = ParseDate(dateStr),
+                            Libelle = libelle,
+                            OperationType = type,
+                            Debit = ParseAmount(debitStr),
+                            Credit = ParseAmount(creditStr)
                         };
 
                         // Ne pas ajouter les transactions invalides
@@ -178,10 +202,9 @@
             if (string.IsNullOrEmpty(_csvContent)) return;
 
             RemoveFirstLines(11);
-            CleanInvalidLineBreaks().Replace(this._csvContent, " ");
-            RemoveMultiSpace().Replace(this._csvContent, " ");
             CleanSeparators();
             RemoveEmptyLines();
+
         }
 
         private void RemoveFirstLines(int linesToSkip)
@@ -232,15 +255,8 @@
             this._csvContent = string.Join(Environment.NewLine, lines.Where(line => !string.IsNullOrWhiteSpace(line)));
         }
 
-        [GeneratedRegex(@" {2,}")]
-        private static partial Regex RemoveMultiSpace();
-        [GeneratedRegex(@"(?<!;)[\r\n]+")]
-        private static partial Regex CleanInvalidLineBreaks();
 
-        [GeneratedRegex(@"\s+")]
-        private static partial Regex CleanDescriptionRegex();
-
-    private DateTime ParseDate(string dateStr)
+        private DateTime ParseDate(string dateStr)
         {
             if (string.IsNullOrWhiteSpace(dateStr)) return DateTime.MinValue;
 
@@ -255,23 +271,15 @@
             return DateTime.MinValue;
         }
 
-        private static string CleanDescription(string description)
-        {
-            if (string.IsNullOrWhiteSpace(description)) return "";
-
-            // Nettoyer la description en supprimant les espaces multiples et les guillemets
-            return CleanDescriptionRegex().Replace(description.Trim().Trim('"'), " ");
-        }
-
         private static float ParseAmount(string amountStr)
         {
             if (string.IsNullOrWhiteSpace(amountStr)) return 0;
 
             // Nettoyer l'amount (supprimer espaces, remplacer virgule par point)
-            var cleanAmount = amountStr.Trim()
-                .Replace(" ", "")
-                .Replace("€", "")
-                .Replace(",", ".");
+            //var cleanAmount = amountStr.Trim()
+            //    .Replace(" ", "")
+            //    .Replace(",", ".");
+            var cleanAmount = IncecableSpace().Replace(amountStr.Trim(), "").Replace(",", ".");
 
             if (float.TryParse(cleanAmount, NumberStyles.Any, CultureInfo.InvariantCulture, out float amount))
             {
@@ -280,5 +288,52 @@
 
             return 0;
         }
+
+        private static string CleanLibelle(string libelleRaw)
+        {
+            if (string.IsNullOrWhiteSpace(libelleRaw)) return string.Empty;
+
+            var parts = libelleRaw.Split(new[] { ";;" }, StringSplitOptions.None);
+
+            if (parts.Length < 2) return libelleRaw;
+
+            var result = parts[1].Replace(";", "").Trim();
+            result = MultiSpace().Replace(result, " ");
+            result = XAndNumbers().Replace(result, "");
+            result = FormatDateDDMM().Replace(result, "");
+
+            return result;
+        }
+
+        private static OperationType ExtractOperationType(string libelle)
+        {
+            if (string.IsNullOrWhiteSpace(libelle)) return OperationType.Unknown;
+
+            var upper = libelle.ToUpperInvariant();
+
+            if (upper.Contains("PRELEVEMENT")) return OperationType.Prelevement;
+            if (upper.Contains("PAIEMENT PAR CARTE")) return OperationType.PaiementCarte;
+            if (upper.Contains("VIREMENT EMIS")) return OperationType.VirementEmis;
+            if (upper.Contains("VIREMENT EN VOTRE FAVEUR") || upper.Contains("VIREMENT RECU"))
+                return OperationType.VirementRecu;
+            if (upper.Contains("REMBOURSEMENT DE PRET") || upper.Contains("REMBOURSEMENT PRET"))
+                return OperationType.RemboursementPret;
+            if (upper.Contains("REGLEMENT")) return OperationType.Reglement;
+            if (upper.Contains("REMISE DE CHEQUE")) return OperationType.ChequeEmis;
+
+            return OperationType.Unknown;
+        }
+
+        [GeneratedRegex(@"\s+")]
+        private static partial Regex MultiSpace();
+
+        [GeneratedRegex(@"^X\d+\s+")]
+        private static partial Regex XAndNumbers();
+
+        [GeneratedRegex(@"\s+\d{2}/\d{2}\s*$")]
+        private static partial Regex FormatDateDDMM();
+
+        [GeneratedRegex(@"[\s.\u00A0\u202F\u2009]")]
+        private static partial Regex IncecableSpace();
     } 
 }

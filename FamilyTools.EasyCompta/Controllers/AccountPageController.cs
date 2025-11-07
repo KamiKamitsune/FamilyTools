@@ -20,7 +20,8 @@ namespace FamilyTools.EasyCompta.Controllers
         {
             try
             {
-                var result = await this.business.GetPageByDate(DateTime.Now);
+                var date = DateTime.Now;
+                var result = await this.business.GetPageByDate(date.Month, date.Year);
                 return this.Ok(result);
             }
             catch (Exception ex)
@@ -30,13 +31,13 @@ namespace FamilyTools.EasyCompta.Controllers
             }
         }
 
-        [Route("[action]")]
+        [Route("[action]/{month}/{year}")]
         [HttpGet]
-        public async Task<IActionResult> Get(DateTime date)
+        public async Task<IActionResult> Get(int month, int year)
         {
             try
             {
-                var result = await this.business.GetPageByDate(date);
+                var result = await this.business.GetPageByDate(month, year);
                 return this.Ok(result);
             }
             catch (Exception ex)

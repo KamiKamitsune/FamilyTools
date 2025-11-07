@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
+using static FamilyTools.Data.Models.EasyCompta.EnumEasycompta;
+
 namespace FamilyTools.Data.Models.EasyCompta
 {
     [Table("AccountEnters")]
@@ -8,6 +10,7 @@ namespace FamilyTools.Data.Models.EasyCompta
     {
         public ICollection<AccountLine> Lines { get; set; } = new List<AccountLine>();
         public AccountTag Tag { get; set; } = new AccountTag();
+        public OperationType OperationType { get; set; }
         public string Name { get; set; } = string.Empty;
         public float TotalValue { get; set; }
         public DateOnly Date { get; set; }
@@ -24,9 +27,10 @@ namespace FamilyTools.Data.Models.EasyCompta
             }
         }
 
-        public AccountEnter(string name, DateOnly date, float totalValue, List<AccountLine> lines, AccountTag tag)
+        public AccountEnter(string name, OperationType operationType, DateOnly date, float totalValue, List<AccountLine> lines, AccountTag tag)
         {
             Name = name;
+            OperationType = operationType;
             TotalValue = totalValue;
             Date = date;
             Lines = lines;

@@ -21,7 +21,7 @@ export class AccountEnterComponent implements OnInit{
   private readonly http = inject(HttpClient);
   private formBuilder = inject(FormBuilder);
 
-  enter : AccountEnter = new AccountEnter("", 0,new AccountTag("", "") , new Date(), []);
+  enter : AccountEnter = new AccountEnter("",0, 0,new AccountTag("", "") , new Date(), []);
 
   id_user_modifier : number[] = [];
 

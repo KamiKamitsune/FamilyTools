@@ -49,6 +49,7 @@ export class UserComponent{
           this.userform.getRawValue().username
         );
         this.service.createUserApi(user);
+        this.userform.reset();
     }
 
   }

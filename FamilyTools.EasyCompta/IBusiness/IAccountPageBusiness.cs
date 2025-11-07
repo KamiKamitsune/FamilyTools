@@ -6,6 +6,6 @@ namespace FamilyTools.EasyCompta.IBusiness
     {
         Task CreateListPage(List<AccountPage> pages);
         Task<List<DateOnly>> GetAllMonth();
-        public Task<AccountPage> GetPageByDate(DateTime date);
+        public Task<AccountPage> GetPageByDate(int month, int year);
     }
 }

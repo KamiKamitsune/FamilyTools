@@ -1,19 +1,19 @@
     <div class="header">
       <h1>Tableau de Bord Comptable</h1>
       <div class="month-selector">
-        <button class="btn btn-secondary">&lt;</button>     
-        <select>
+        <!-- <button class="btn btn-secondary">&lt;</button>      -->
+        <select (change)="changePages($event)">
 
-        @for (month of month_list; track $index) {
-          @if (month.getMonth() == this.current_page?.date?.getMonth()) {
-            <option selected value="{{ month.getMonth() }}">{{ month | date : "MMMM"}}</option>
+        @for (date of date_list; track $index) {
+          @if (date.getMonth() == this.last_date.getMonth() && date.getFullYear() == this.last_date.getFullYear()) {
+            <option selected value="{{ date }} ">{{ date | date : "MMMM yyyy"}}</option>
           }@else {
-            <option value="{{ month.getMonth() }}">{{ month | date : "MMMM"}}</option>
+            <option value="{{ date }}">{{ date | date : "MMMM yyyy"}}</option>
           }
         }
 
         </select>
-        <button class="btn btn-secondary">&gt;</button>
+        <!-- <button class="btn btn-secondary">&gt;</button> -->
       </div>
     </div>
     
@@ -48,14 +48,15 @@
             <label>Statut:</label>
             <select>
               <option value="">Tous</option>
-              <option value="payé">Payé</option>
-              <option value="en attente">En attente</option>
+              <!-- <option value="payé">Payé</option>
+              <option value="en attente">En attente</option> -->
             </select>
           </div>
         </div>
         <div class="action-buttons">
           <button class="btn btn-primary" routerLink='/easycompta/account-enter'> + Ajouter une entrée</button>
-          <input type="file" 
+          <input #addCsvButton
+           type="file" 
               accept=".csv" 
               (change)="onFileSelected($event)">
         <button (click)="uploadFile()" 
@@ -67,6 +68,7 @@
       <table>
         <thead>
           <tr>
+            <th>Type d'operation<span class="sort-icon">↕</span></th>
             <th>Description <span class="sort-icon">↕</span></th>
             <th>Catégorie</th>
             <th>Montant <span class="sort-icon">↕</span></th>
@@ -78,9 +80,10 @@
         <tbody>
           @for (enter of current_page?.enters; track $index) {
             <tr>
+              <td>{{ enter.operationType }}</td>
               <td>{{ enter.name }}</td>
               <td><span class="tag-icon">⚡</span></td>
-              <td class="numeric-value">{{ enter.totalValue }}</td>
+              <td class="numeric-value">{{ enter.totalValue }} €</td>
               <td>
                 <div class="assignee-list">
                   @for (line of enter.lines; track $index) {

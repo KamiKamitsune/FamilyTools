@@ -12,6 +12,7 @@ namespace FamilyTools.Data.Configuration.EasyCompta
             builder.ToTable("AccountEnters");
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Name).IsRequired();
+            builder.Property(e => e.OperationType).IsRequired();
             builder.Property(e => e.TotalValue).IsRequired();
             builder.Property(e => e.Date).IsRequired();
             builder.Property(e => e.CreationDate).IsRequired().HasDefaultValueSql("getdate()");

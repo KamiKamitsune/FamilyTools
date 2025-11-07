@@ -12,10 +12,10 @@ namespace FamilyTools.EasyCompta.Business
     {
         private readonly IAccountEnterBusiness _accountEnterBusiness = accountEnterBusiness;
 
-        public async Task<AccountPage> GetPageByDate(DateTime date) {
-            if (await _context.AccountPages.AnyAsync() && date != default)
+        public async Task<AccountPage> GetPageByDate(int month, int year) {
+            if (await _context.AccountPages.AnyAsync() && month != default && year != default)
             {
-                return await this._context.AccountPages.Where(page => page.Date.Month == date.Month && page.Date.Year == date.Year).
+                return await this._context.AccountPages.Where(page => page.Date.Month == month && page.Date.Year == year).
                     Include(page => page.Enters).FirstOrDefaultAsync() ?? new AccountPage();
             }
             return new AccountPage();
