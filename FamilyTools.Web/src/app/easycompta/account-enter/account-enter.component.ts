@@ -6,7 +6,6 @@ import { AccountEnter } from '../../models/account-enter';
 import { AccountTag } from '../../models/account-tag';
 import { User } from '../../models/user';
 import { AccountLine } from '../../models/account-line';
-import { RedirectCommand } from '@angular/router';
 
 @Component({
   selector: 'app-accountenter',

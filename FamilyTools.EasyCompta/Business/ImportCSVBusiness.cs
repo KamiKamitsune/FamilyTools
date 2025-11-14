@@ -313,12 +313,14 @@
 
             if (upper.Contains("PRELEVEMENT")) return OperationType.Prelevement;
             if (upper.Contains("PAIEMENT PAR CARTE")) return OperationType.PaiementCarte;
-            if (upper.Contains("VIREMENT EMIS")) return OperationType.VirementEmis;
             if (upper.Contains("VIREMENT EN VOTRE FAVEUR") || upper.Contains("VIREMENT RECU"))
                 return OperationType.VirementRecu;
+            if (upper.Contains("VIREMENT EMIS")) return OperationType.VirementEmis;
             if (upper.Contains("REMBOURSEMENT DE PRET") || upper.Contains("REMBOURSEMENT PRET"))
                 return OperationType.RemboursementPret;
             if (upper.Contains("REGLEMENT")) return OperationType.Reglement;
+            if (upper.Contains("AVOIR")) return OperationType.Avoir;
+            if (upper.Contains("COTISATION")) return OperationType.Cotisation;
             if (upper.Contains("REMISE DE CHEQUE")) return OperationType.ChequeEmis;
 
             return OperationType.Unknown;

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AccountTag } from '../../models/account-tag';
+import { OPERATIONTYPESTRING } from './../../constants/app.constants'
 
 @Component({
   selector: 'app-accountpage',
@@ -19,6 +20,7 @@ export class AccountPageComponent implements OnInit {
   current_tags: AccountTag[] = [];
   selectedFile: File | undefined;
   @ViewChild('addCsvButton', { static: false }) addCsvButton!: ElementRef<HTMLInputElement>;
+  operationtype = OPERATIONTYPESTRING;
 
 
   private readonly _http = inject(HttpClient);
@@ -65,7 +67,7 @@ export class AccountPageComponent implements OnInit {
     if (this._http) {
       month = month + 1;
       let page = this.pages.find(x => x.date.getMonth() == month && x.date.getFullYear() == year);
-      if (page!= undefined) {
+      if (page != undefined) {
         this.current_page = page;
       }
       else {
@@ -73,6 +75,7 @@ export class AccountPageComponent implements OnInit {
           next: result => {
             result.date = new Date(result.date);
             this.current_page = result;
+            console.log(this.current_page);
           },
           error: console.error
         });

@@ -2,8 +2,6 @@ import { BaseModel } from './base-model';
 import { AccountLine } from './account-line';
 import { AccountTag } from './account-tag';
 
-const Unknown : string = "Inconnu";
-
 enum OperationType{
       Unknown = 0,
       Prelevement = 1,

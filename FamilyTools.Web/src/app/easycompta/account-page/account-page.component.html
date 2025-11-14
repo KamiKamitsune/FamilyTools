@@ -1,131 +1,127 @@
-    <div class="header">
-      <h1>Tableau de Bord Comptable</h1>
-      <div class="month-selector">
-        <!-- <button class="btn btn-secondary">&lt;</button>      -->
-        <select (change)="changePages($event)">
+<div class="header">
+  <h1>Tableau de Bord Comptable</h1>
+  <div class="month-selector">
+    <!-- <button class="btn btn-secondary">&lt;</button>      -->
+    <select (change)="changePages($event)">
 
-        @for (date of date_list; track $index) {
-          @if (date.getMonth() == this.last_date.getMonth() && date.getFullYear() == this.last_date.getFullYear()) {
-            <option selected value="{{ date }} ">{{ date | date : "MMMM yyyy"}}</option>
-          }@else {
-            <option value="{{ date }}">{{ date | date : "MMMM yyyy"}}</option>
+      @for (date of date_list; track $index) {
+      @if (date.getMonth() == this.last_date.getMonth() && date.getFullYear() == this.last_date.getFullYear()) {
+      <option selected value="{{ date }} ">{{ date | date : "MMMM yyyy"}}</option>
+      }@else {
+      <option value="{{ date }}">{{ date | date : "MMMM yyyy"}}</option>
+      }
+      }
+
+    </select>
+    <!-- <button class="btn btn-secondary">&gt;</button> -->
+  </div>
+</div>
+
+<div class="navigation-tabs">
+  <div class="tab active">Tableau de données</div>
+  <div class="tab" routerLink="/easycompta/account-tag"> Tag </div>
+  <div class="tab">Diagrammes</div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <div class="filter-section">
+      <div class="filter-control">
+        <label>Catégorie:</label>
+        <select>
+          <option value="">Toutes</option>
+          @for (tag of this.current_tags; track $index) {
+          <option value="{{ tag.id }}">{{ tag.name }}</option>
           }
-        }
-
         </select>
-        <!-- <button class="btn btn-secondary">&gt;</button> -->
       </div>
-    </div>
-    
-    <div class="navigation-tabs">
-      <div class="tab active">Tableau de données</div>
-      <div class="tab" routerLink="/easycompta/account-tag"> Tag </div>
-      <div class="tab">Diagrammes</div>
-    </div>
-    
-    <div class="card">
-      <div class="toolbar">
-        <div class="filter-section">
-          <div class="filter-control">
-            <label>Catégorie:</label>
-            <select>
-              <option value="">Toutes</option>
-              @for (tag of this.current_tags; track $index) {
-                <option value="{{ tag.id }}">{{ tag.name }}</option>
-              }
-            </select>
-          </div>
-          <div class="filter-control">
-            <label>Personne:</label>
-            <!-- <select>
+      <div class="filter-control">
+        <label>Personne:</label>
+        <!-- <select>
               <option value="">Toutes</option>
               @for (user of this.current_page?.getUsers(); track $index) {
                 <option value="{{ user.id }}">{{ user.userName }}</option>
               }
             </select> -->
-          </div>
-          <div class="filter-control">
-            <label>Statut:</label>
-            <select>
-              <option value="">Tous</option>
-              <!-- <option value="payé">Payé</option>
-              <option value="en attente">En attente</option> -->
-            </select>
-          </div>
-        </div>
-        <div class="action-buttons">
-          <button class="btn btn-primary" routerLink='/easycompta/account-enter'> + Ajouter une entrée</button>
-          <input #addCsvButton
-           type="file" 
-              accept=".csv" 
-              (change)="onFileSelected($event)">
-        <button (click)="uploadFile()" 
-                [disabled]="!selectedFile">
-          Envoyer CSV
-        </button>
-        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Type d'operation<span class="sort-icon">↕</span></th>
-            <th>Description <span class="sort-icon">↕</span></th>
-            <th>Catégorie</th>
-            <th>Montant <span class="sort-icon">↕</span></th>
-            <th>Assigné à</th>
-            <th>Date <span class="sort-icon">↕</span></th>
-            <th class="action-column">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (enter of current_page?.enters; track $index) {
-            <tr>
-              <td>{{ enter.operationType }}</td>
-              <td>{{ enter.name }}</td>
-              <td><span class="tag-icon">⚡</span></td>
-              <td class="numeric-value">{{ enter.totalValue }} €</td>
-              <td>
-                <div class="assignee-list">
-                  @for (line of enter.lines; track $index) {
-                    <span class="assignee-chip">{{ line.userLink.userName }}</span>
-                  }
-                </div>
-              </td>
-              <td> {{ enter.date }}</td>
-              <td>
-                <div class="row-actions">
-                  <button type="button"><span class="action-icon">✏️</span></button>
-                  <button type="button"><span class="action-icon">🗑️</span></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-          }
-        </tbody>
-      </table>
+      <div class="filter-control">
+        <label>Statut:</label>
+        <select>
+          <option value="">Tous</option>
+          <!-- <option value="payé">Payé</option>
+              <option value="en attente">En attente</option> -->
+        </select>
+      </div>
     </div>
-    
-    <h2>Récapitulatif par personne</h2>
-    <div class="summary-section">
+    <div class="action-buttons">
+      <button class="btn btn-primary" routerLink='/easycompta/account-enter'> + Ajouter une entrée</button>
+      <input #addCsvButton type="file" accept=".csv" (change)="onFileSelected($event)">
+      <button (click)="uploadFile()" [disabled]="!selectedFile">
+        Envoyer CSV
+      </button>
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Type d'operation<span class="sort-icon">↕</span></th>
+        <th>Description <span class="sort-icon">↕</span></th>
+        <th>Catégorie</th>
+        <th>Montant <span class="sort-icon">↕</span></th>
+        <th>Assigné à</th>
+        <th>Date <span class="sort-icon">↕</span></th>
+        <th class="action-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (enter of current_page?.enters; track $index) {
+      <tr>
+        <td>{{ operationtype[enter.operationType] }}</td>
+        <td>{{ enter.name }}</td>
+        <td><span class="tag-icon">⚡</span></td>
+        <td class="numeric-value">{{ enter.totalValue }} €</td>
+        <td>
+          <div class="assignee-list">
+            @for (line of enter.lines; track $index) {
+            <span class="assignee-chip">{{ line.userLink.userName }}</span>
+            }
+          </div>
+        </td>
+        <td> {{ enter.date }}</td>
+        <td>
+          <div class="row-actions">
+            <button type="button"><span class="action-icon">✏️</span></button>
+            <button type="button"><span class="action-icon">🗑️</span></button>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        }
+    </tbody>
+  </table>
+</div>
 
-      @for (payment_done of this.current_page?.paymentDones; track $index) {
-        <div class="summary-card">
-          <div class="summary-header">
-            <h3>{{ payment_done[0].userName }}</h3>
-          </div>
-          <div class="summary-amount">{{ this.current_page?.getTotalForUser(payment_done[0].id) }}</div>
-          <div class="summary-status">
-            <span>Mois payé :</span>
-            <label class="toggle-switch">
-              @if (payment_done[1]) {
-                <input type="checkbox" checked>
-              }
-              @else {
-                <input type="checkbox">
-              }
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-      }
+<h2>Récapitulatif par personne</h2>
+<div class="summary-section">
+
+  @for (payment_done of this.current_page?.paymentDones; track $index) {
+  <div class="summary-card">
+    <div class="summary-header">
+      <h3>{{ payment_done[0].userName }}</h3>
     </div>
+    <div class="summary-amount">{{ this.current_page?.getTotalForUser(payment_done[0].id) }}</div>
+    <div class="summary-status">
+      <span>Mois payé :</span>
+      <label class="toggle-switch">
+        @if (payment_done[1]) {
+        <input type="checkbox" checked>
+        }
+        @else {
+        <input type="checkbox">
+        }
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+  }
+</div>
