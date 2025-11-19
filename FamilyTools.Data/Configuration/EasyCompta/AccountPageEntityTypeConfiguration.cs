@@ -23,11 +23,15 @@ namespace FamilyTools.Data.Configuration.EasyCompta
                   .HasForeignKey(e => e.PageId)
                   .IsRequired();
 
+            builder.Navigation(e => e.Enters).AutoInclude();
+
             // Configuration du dictionnaire PaymentDone
             builder.HasMany<PaymentDone>(e => e.PaymentDones)
                   .WithOne(e => e.Page)
                   .HasForeignKey(e => e.PageId)
                   .IsRequired();
+
+            builder.Navigation(e => e.PaymentDones).AutoInclude();
         }
     }
 }

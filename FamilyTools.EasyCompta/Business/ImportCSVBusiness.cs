@@ -63,14 +63,13 @@
                  .Select(x => new Tuple<int, int, List<AccountEnter>>(x.Key.Year, x.Key.Month, [.. x]))
                  .ToList();
 
-            //TODO: Créer des account page par rapport au mois et a l'année si elle n'existe pas, sinon les ajoutées à des pages existante
             List<AccountPage> pages = [];
             foreach (var accountEnter in accountEnterGroupByMouthAndYear)
             {
                 pages.Add(new AccountPage(accountEnter.Item3, new DateOnly(accountEnter.Item1, accountEnter.Item2, 1)));
             }
 
-            await this._accountPageBusiness.CreateListPage(pages);
+            await this._accountPageBusiness.CreateOrUpdateListPage(pages);
 
         }
 

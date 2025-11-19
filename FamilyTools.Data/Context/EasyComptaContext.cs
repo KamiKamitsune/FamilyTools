@@ -18,6 +18,7 @@ namespace FamilyTools.Data.Context
         public DbSet<AccountPage> AccountPages => Set<AccountPage>();
         public DbSet<AccountTag> AccountTags => Set<AccountTag>();
         public DbSet<Template> Templates => Set<Template>();
+        public DbSet<PaymentDone> PaymentDones => Set<PaymentDone>();
 
         public async Task EnsureSeedData()
         {
@@ -44,6 +45,8 @@ namespace FamilyTools.Data.Context
             
             // Configuration de Template
             new TemplateEntityTypeConfiguration().Configure(modelBuilder.Entity<Template>());
+
+            new PaymentDoneEntityTypeConfiguration().Configure(modelBuilder.Entity<PaymentDone>());
 
             base.OnModelCreating(modelBuilder);
         }

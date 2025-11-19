@@ -82,8 +82,8 @@
         <td class="numeric-value">{{ enter.totalValue }} €</td>
         <td>
           <div class="assignee-list">
-            @for (line of enter.lines; track $index) {
-            <span class="assignee-chip">{{ line.userLink.userName }}</span>
+            @for (line of enter.lines; let last = $last; track line) {
+            {{ line.user.userName }}@if (!last) { , }
             }
           </div>
         </td>
@@ -107,13 +107,13 @@
   @for (payment_done of this.current_page?.paymentDones; track $index) {
   <div class="summary-card">
     <div class="summary-header">
-      <h3>{{ payment_done[0].userName }}</h3>
+      <h3>{{ payment_done.user.userName }}</h3>
     </div>
-    <div class="summary-amount">{{ this.current_page?.getTotalForUser(payment_done[0].id) }}</div>
+    <div class="summary-amount">{{ payment_done.total }}</div>
     <div class="summary-status">
       <span>Mois payé :</span>
       <label class="toggle-switch">
-        @if (payment_done[1]) {
+        @if (payment_done.paymentIsDone) {
         <input type="checkbox" checked>
         }
         @else {

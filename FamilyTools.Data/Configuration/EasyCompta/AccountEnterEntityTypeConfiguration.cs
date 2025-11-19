@@ -24,11 +24,15 @@ namespace FamilyTools.Data.Configuration.EasyCompta
                   .HasForeignKey(e => e.EnterId)
                   .IsRequired();
 
+            builder.Navigation(e => e.Lines).AutoInclude();
+
             // Relation avec AccountTag
             builder.HasOne(e => e.Tag)
                   .WithMany()
                   .HasForeignKey("TagId")
                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Navigation(e => e.Tag).AutoInclude();
         }
     }
 }

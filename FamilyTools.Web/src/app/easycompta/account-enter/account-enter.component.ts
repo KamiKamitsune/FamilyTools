@@ -104,7 +104,7 @@ export class AccountEnterComponent implements OnInit{
 
   changeValueForOneLines(userId: number, value: number){
     
-    this.enter.lines.forEach(line => line.userLink.id == userId ? line.value = value : line.value);
+    this.enter.lines.forEach(line => line.user.id == userId ? line.value = value : line.value);
 
     if (!this.id_user_modifier.includes(userId)) {
       this.id_user_modifier.push(userId);
@@ -113,15 +113,15 @@ export class AccountEnterComponent implements OnInit{
     let total = this.enter.totalValue;
 
     this.enter.lines.forEach(line => {
-      if (line.userLink.id) {        
-        if (this.id_user_modifier.includes(line.userLink.id)) {
+      if (line.user.id) {        
+        if (this.id_user_modifier.includes(line.user.id)) {
           total -= line.value;
         }
       }
     });
 
 
-    let value_by_user = total / this.enter.lines.map(line => this.id_user_modifier.includes(line.userLink.id)).length;
+    let value_by_user = total / this.enter.lines.map(line => this.id_user_modifier.includes(line.user.id)).length;
     this.enter.lines.forEach(line => line.value = this.id_user_modifier.includes(line.id) ? line.value : value_by_user );
 
     if (this.enter.totalValue != this.enter.getTotal()) {

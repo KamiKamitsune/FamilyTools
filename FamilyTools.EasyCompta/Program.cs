@@ -12,6 +12,7 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddScoped<IUserBusiness, UserBusiness>();
+builder.Services.AddScoped<IPaymentDoneBusiness, PaymentDoneBusiness>();
 builder.Services.AddScoped<ITemplateBusiness, TemplateBusiness>();
 builder.Services.AddScoped<IAccountEnterBusiness, AccountEnterBusiness>();
 builder.Services.AddScoped<IAccountTagBusiness, AccountTagBusiness>();

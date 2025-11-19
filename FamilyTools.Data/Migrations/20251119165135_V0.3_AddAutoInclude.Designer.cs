@@ -4,6 +4,7 @@ using FamilyTools.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FamilyTools.Data.Migrations
 {
     [DbContext(typeof(EasyComptaContext))]
-    partial class EasyComptaContextModelSnapshot : ModelSnapshot
+    [Migration("20251119165135_V0.3_AddAutoInclude")]
+    partial class V03_AddAutoInclude
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

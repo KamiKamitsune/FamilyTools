@@ -76,6 +76,7 @@ export class AccountPageComponent implements OnInit {
             result.date = new Date(result.date);
             this.current_page = result;
             console.log(this.current_page);
+            console.log(this.pages);
           },
           error: console.error
         });

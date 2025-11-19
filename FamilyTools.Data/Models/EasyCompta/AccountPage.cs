@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace FamilyTools.Data.Models.EasyCompta
 {
@@ -19,10 +21,6 @@ namespace FamilyTools.Data.Models.EasyCompta
 
         public AccountPage()
         {
-            if (Enters?.Count > 0)
-            {
-                Total = Enters.Sum(enter => enter.TotalValue);
-            }
         }
 
         public AccountPage(List<AccountEnter> enters, DateOnly date) : this()

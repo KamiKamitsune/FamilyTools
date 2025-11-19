@@ -8,9 +8,8 @@ namespace FamilyTools.Data.Configuration.EasyCompta
     {
         public void Configure(EntityTypeBuilder<PaymentDone> builder)
         {
-            builder.ToTable("AccountEnters");
+            builder.ToTable("PaymentDones");
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.User).IsRequired();
             builder.Property(e => e.Total).IsRequired();
             builder.Property(e => e.PaymentIsDone).IsRequired();
             builder.Property(e => e.CreationDate).IsRequired().HasDefaultValueSql("getdate()");
@@ -18,9 +17,11 @@ namespace FamilyTools.Data.Configuration.EasyCompta
 
             // Relation avec User
             builder.HasOne(e => e.User)
-                .WithMany()
-                .HasForeignKey("UserId")
-                .OnDelete(DeleteBehavior.Restrict);
+              .WithMany()
+              .HasForeignKey(e => e.UserId)
+              .IsRequired();
+
+            builder.Navigation(e => e.User).AutoInclude();
         }
     }
 }

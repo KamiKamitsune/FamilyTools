@@ -21,6 +21,8 @@ namespace FamilyTools.Data.Configuration.EasyCompta
                   .WithMany()
                   .HasForeignKey(e => e.UserId)
                   .IsRequired();
+
+            builder.Navigation(e => e.User).AutoInclude();
         }
     }
 }

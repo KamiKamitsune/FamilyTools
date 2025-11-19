@@ -20,6 +20,8 @@ namespace FamilyTools.Data.Configuration.EasyCompta
             builder.HasMany(e => e.Enters)
                   .WithMany()
                   .UsingEntity(j => j.ToTable("TemplateEnters"));
+
+            builder.Navigation(e => e.Enters).AutoInclude();
         }
     }
 }
