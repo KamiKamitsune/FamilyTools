@@ -1,10 +1,6 @@
-﻿using System.Linq;
-
-using FamilyTools.Data.Context;
+﻿using FamilyTools.Data.Context;
 using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
-
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace FamilyTools.EasyCompta.Business
 {

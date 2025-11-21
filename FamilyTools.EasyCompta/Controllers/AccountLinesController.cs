@@ -6,7 +6,7 @@ namespace FamilyTools.EasyCompta.Controllers
 {
     [ApiController]
     [Route("easycompta/[controller]")]
-    public class AccountLinesController(IAccountLineBusiness business, ILogger<AccountLinesController> logger) : Controller
+    public class AccountLinesController(IAccountLineBusiness business, ILogger<AccountLinesController> logger) : ControllerBase
     {
         private readonly IAccountLineBusiness business = business;
         private readonly ILogger<AccountLinesController> logger = logger;
@@ -14,7 +14,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [Route("[action]")]
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Value")] AccountLine accountLine)
+        public async Task<IActionResult> Create([FromBody] AccountLine accountLine)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [HttpPost]
         [HttpPut]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Name,Value")] AccountLine accountLine)
+        public async Task<IActionResult> Edit([FromBody] AccountLine accountLine)
         {
             try
             {

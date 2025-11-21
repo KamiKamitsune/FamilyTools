@@ -30,7 +30,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [Route("[action]")]
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Lines,Tag,Name,LifeTime")] AccountEnter accountEnter)
+        public async Task<IActionResult> Create([FromBody] AccountEnter accountEnter)
         {
             try
             {
@@ -47,7 +47,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [HttpPost]
         [HttpPut]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Lines,Tag,Name,LifeTime")] AccountEnter accountEnter)
+        public async Task<IActionResult> Edit([FromBody] AccountEnter accountEnter)
         {
             try
             {

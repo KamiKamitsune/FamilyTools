@@ -31,7 +31,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [Route("[action]")]
         [HttpPost]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Lines,LifeTime")] Template template)
+        public async Task<IActionResult> Create([FromBody] Template template)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace FamilyTools.EasyCompta.Controllers
         [HttpPost]
         [HttpPut]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Name,Lines,LifeTime")] Template template)
+        public async Task<IActionResult> Edit([FromBody] Template template)
         {
             try
             {

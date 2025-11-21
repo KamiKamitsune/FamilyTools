@@ -6,7 +6,7 @@ namespace FamilyTools.EasyCompta.Controllers
 {
     [ApiController]
     [Route("easycompta/[controller]")]
-    public class ImportCSVController(IImportCSVBusiness business, ILogger<ImportCSVController> logger) : Controller
+    public class ImportCSVController(IImportCSVBusiness business, ILogger<ImportCSVController> logger) : ControllerBase
     {
         private readonly ILogger<ImportCSVController> logger = logger;
         private readonly IImportCSVBusiness business = business;
