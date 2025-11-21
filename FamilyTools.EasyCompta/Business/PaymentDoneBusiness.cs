@@ -1,4 +1,6 @@
-﻿using FamilyTools.Data.Context;
+﻿using System.Linq;
+
+using FamilyTools.Data.Context;
 using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
 
@@ -54,6 +56,27 @@ namespace FamilyTools.EasyCompta.Business
                     ToList();
             }
             return [];
-        }      
+        }
+
+        public async Task<PaymentDone> UpdateStatePaymentDone(int id, bool status)
+        {
+            if (id == default)
+            {
+                throw new ArgumentException("L'identifiant du paiement est invalide.");
+            }
+
+            var payment = this._context.PaymentDones.Where(x => x.Id == id).FirstOrDefault();
+
+            if (payment == default)
+            {
+                throw new ArgumentException("Le paiement n'existe pas.");
+            }
+
+            payment.PaymentIsDone = status;
+            this._context.Update(payment);
+            await this._context.SaveChangesAsync();
+
+            return payment;
+        }
     }
 }

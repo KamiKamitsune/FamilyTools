@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AccountTag } from '../../models/account-tag';
 import { OPERATIONTYPESTRING } from './../../constants/app.constants'
+import { PaymentDone } from '../../models/payment-done';
 
 @Component({
   selector: 'app-accountpage',
@@ -75,8 +76,6 @@ export class AccountPageComponent implements OnInit {
           next: result => {
             result.date = new Date(result.date);
             this.current_page = result;
-            console.log(this.current_page);
-            console.log(this.pages);
           },
           error: console.error
         });
@@ -89,9 +88,7 @@ export class AccountPageComponent implements OnInit {
   }
 
   onFileSelected(event: any) {
-    console.log('onFileSelected');
     const file: File = event.target.files[0];
-    console.log(file.type);
     if (file) {
       this.selectedFile = file;
     }
@@ -105,7 +102,6 @@ export class AccountPageComponent implements OnInit {
 
       this._http.post("api/easycompta/ImportCSV", formData).subscribe({
         next: (response) => {
-          console.log('Fichier envoyé avec succès', response);
           this.addCsvButton.nativeElement.value = "";
           window.location.reload();
         },
@@ -113,6 +109,20 @@ export class AccountPageComponent implements OnInit {
           console.error('Erreur lors de l\'envoi', error);
         }
       });
+    }
+  }
+
+  clickPaymentDone(event: any){
+    if (this._http) {
+      this._http.patch<PaymentDone>(`api/easycompta/PaymentDone/Patch/${event.target.id}`, event.target.checked).subscribe({
+        next: (response) => {
+          this.current_page?.paymentDones.map(x => x.id == response.id? x = response : null);
+        },
+        error: (error => {
+          console.log(error);
+          event.target.checked = !event.target.checked;
+        })
+      })
     }
   }
 

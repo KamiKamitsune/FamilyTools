@@ -7,5 +7,6 @@ namespace FamilyTools.EasyCompta.IBusiness
         Task<List<PaymentDone>> CreateListFromPage(AccountPage page);
         List<PaymentDone> getPaymentDonesFromPages(AccountPage page);
         Task<List<PaymentDone>> UpdateListFromPage(AccountPage page);
+        Task<PaymentDone> UpdateStatePaymentDone(int id, bool status);
     }
 }

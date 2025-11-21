@@ -1,16 +1,16 @@
 import { BaseModel } from './base-model';
 import { User } from './user';
 import { AccountEnter } from './account-enter';
-import { paymentDones } from './payment-done';
+import { PaymentDone } from './payment-done';
 
 export class AccountPage extends BaseModel {
   name: string;
   enters: AccountEnter[];
-  paymentDones: paymentDones[];
+  paymentDones: PaymentDone[];
   isClosing: boolean;
   date: Date;
 
-  constructor(name: string, enters: AccountEnter[], paymentDones: paymentDones[], isClosing: boolean, date: Date, id?: number, creationDate?: Date, updateDate?: Date){
+  constructor(name: string, enters: AccountEnter[], paymentDones: PaymentDone[], isClosing: boolean, date: Date, id?: number, creationDate?: Date, updateDate?: Date){
     super(id, creationDate, updateDate);
     this.name = name;
     this.enters = enters;

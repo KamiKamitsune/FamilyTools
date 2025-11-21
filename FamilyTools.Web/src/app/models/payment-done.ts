@@ -1,7 +1,7 @@
 import { BaseModel } from "./base-model";
 import { User } from "./user";
 
-export class paymentDones extends BaseModel{
+export class PaymentDone extends BaseModel{
     user: User;
     paymentIsDone : boolean;
     total: number;
