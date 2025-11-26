@@ -15,6 +15,7 @@ namespace FamilyTools.Data.Configuration.EasyCompta
             builder.Property(e => e.OperationType).IsRequired();
             builder.Property(e => e.TotalValue).IsRequired();
             builder.Property(e => e.Date).IsRequired();
+            builder.Property(e => e.IsDisabled).IsRequired();
             builder.Property(e => e.CreationDate).IsRequired().HasDefaultValueSql("getdate()");
             builder.Property(e => e.UpdateDate);
 

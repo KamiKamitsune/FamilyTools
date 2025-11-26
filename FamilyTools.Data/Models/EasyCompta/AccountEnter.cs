@@ -15,6 +15,7 @@ namespace FamilyTools.Data.Models.EasyCompta
         public float TotalValue { get; set; }
         public DateOnly Date { get; set; }
         public int PageId { get; set; }
+        public bool IsDisabled { get; set; }
 
         [JsonIgnore]
         public AccountPage Page { get; set; } = null!;

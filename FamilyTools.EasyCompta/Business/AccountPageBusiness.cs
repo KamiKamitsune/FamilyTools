@@ -34,7 +34,7 @@ namespace FamilyTools.EasyCompta.Business
                 var pageExiste = await this._context.AccountPages.Where(x => x.Date.Month == page.Date.Month && x.Date.Year == page.Date.Year).FirstOrDefaultAsync();
                 if (pageExiste == default)
                 {
-                    page.PaymentDones = this._paymentDoneBusiness.getPaymentDonesFromPages(page);
+                    page.PaymentDones = this._paymentDoneBusiness.CalculPaymentDonesFromEnters(page.Enters);
                     this._context.AccountPages.Add(page);
                 }
                 else

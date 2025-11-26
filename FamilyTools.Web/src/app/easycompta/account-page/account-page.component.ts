@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import { AccountTag } from '../../models/account-tag';
 import { OPERATIONTYPESTRING } from './../../constants/app.constants'
 import { PaymentDone } from '../../models/payment-done';
+import { AccountEnter } from '../../models/account-enter';
 
 @Component({
   selector: 'app-accountpage',
@@ -14,7 +15,6 @@ import { PaymentDone } from '../../models/payment-done';
   styleUrl: './account-page.component.css'
 })
 export class AccountPageComponent implements OnInit {
-  pages: AccountPage[] = [];
   current_page: AccountPage | undefined;
   date_list: Date[] = [];
   last_date: Date = new Date();
@@ -31,21 +31,10 @@ export class AccountPageComponent implements OnInit {
     this.get_all_month();
   }
 
-  private get_page_id_by_month(date: Date): number | undefined {
-    const page = this.pages.find(x => x.date.getMonth() == date.getMonth() && x.date.getFullYear() == date.getFullYear());
-    return page?.id;
-  }
-
   public async changePages(event: Event) {
     const select = event.target as HTMLSelectElement;
     const value = new Date(select.value);
-    const pageid = this.get_page_id_by_month(value)
-    if (value == undefined || !this.pages.some(x => x.id == pageid)) {
       this.call_new_page(value.getMonth(), value.getFullYear());
-    }
-    else {
-      this.current_page = this.pages.find(x => x.id == pageid);
-    }
   }
 
   private get_all_month() {
@@ -67,11 +56,6 @@ export class AccountPageComponent implements OnInit {
   private call_new_page(month: number, year: number) {
     if (this._http) {
       month = month + 1;
-      let page = this.pages.find(x => x.date.getMonth() == month && x.date.getFullYear() == year);
-      if (page != undefined) {
-        this.current_page = page;
-      }
-      else {
         this._http.get<AccountPage>(`api/easycompta/AccountPage/Get/${month}/${year}`).subscribe({
           next: result => {
             result.date = new Date(result.date);
@@ -79,7 +63,6 @@ export class AccountPageComponent implements OnInit {
           },
           error: console.error
         });
-      }
     }
   }
 
@@ -120,6 +103,26 @@ export class AccountPageComponent implements OnInit {
         },
         error: (error => {
           console.log(error);
+          event.target.checked = !event.target.checked;
+        })
+      })
+    }
+  }
+
+  disabledEnter(event: any){
+    if (this._http) {
+      this._http.patch<AccountEnter>(`api/easycompta/AccountEnter/Desabled/${event.target.id}`, !event.target.checked).subscribe({
+        next: (response) => {
+          this.current_page?.enters.map(x => x.id == response.id? x.isDisabled = response.isDisabled : null)
+          this._http.get<PaymentDone[]>(`api/easycompta/PaymentDone/getByPageId/${this.current_page?.id}`).subscribe({
+            next:(response) => {
+              if (this.current_page) {
+                this.current_page.paymentDones = response;
+              }
+            }
+          })
+        },
+        error: (error => {
           event.target.checked = !event.target.checked;
         })
       })

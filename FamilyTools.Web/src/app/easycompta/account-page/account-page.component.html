@@ -69,6 +69,7 @@
         <th>Catégorie</th>
         <th>Montant <span class="sort-icon">↕</span></th>
         <th>Assigné à</th>
+        <th>activé</th>
         <th>Date <span class="sort-icon">↕</span></th>
         <th class="action-column">Actions</th>
       </tr>
@@ -86,6 +87,17 @@
             {{ line.user.userName }}@if (!last) { , }
             }
           </div>
+        </td>
+        <td>
+          <label class="toggle-switch">
+            @if (enter.isDisabled) {
+              <input type="checkbox" id="{{ enter.id }}" (change)="disabledEnter($event)">
+            }
+            @else {
+              <input type="checkbox" checked id="{{ enter.id }}" (change)="disabledEnter($event)">
+            }
+            <span class="toggle-slider"></span>
+          </label>
         </td>
         <td> {{ enter.date }}</td>
         <td>

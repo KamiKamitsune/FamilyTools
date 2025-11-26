@@ -2,15 +2,17 @@
 using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace FamilyTools.EasyCompta.Business
 {
     public class PaymentDoneBusiness(EasyComptaContext context) : BaseBusiness<PaymentDone>(context), IPaymentDoneBusiness
     {
         public async Task<List<PaymentDone>> CreateListFromPage(AccountPage page)
         {
-            var newPaymentDones = this.getPaymentDonesFromPages(page);
+            var newPaymentDones = this.CalculPaymentDonesFromEnters(page.Enters);
 
-            this._context.PaymentDones.AddRange(this.getPaymentDonesFromPages(page));
+            this._context.PaymentDones.AddRange(newPaymentDones);
 
             await _context.SaveChangesAsync();
             return newPaymentDones;
@@ -18,7 +20,7 @@ namespace FamilyTools.EasyCompta.Business
 
         public async Task<List<PaymentDone>> UpdateListFromPage(AccountPage page)
         {
-            var newpayementDones = this.getPaymentDonesFromPages(page);
+            var newpayementDones = this.CalculPaymentDonesFromEnters(page.Enters);
             var updatePaymentDones = page.PaymentDones.Join(newpayementDones,
                 existing => existing.User.Id,
                 newly => newly.User.Id,
@@ -31,25 +33,57 @@ namespace FamilyTools.EasyCompta.Business
             await _context.SaveChangesAsync();
 
             return updatePaymentDones.ToList();
-
         }
 
-        public List<PaymentDone> getPaymentDonesFromPages(AccountPage page)
+        public async Task<List<PaymentDone>> UpdateListFromPage(List<AccountEnter> enters)
         {
-            if (page.Enters?.Count > 0)
-            {
-                page.Total = page.Enters.Sum(enter => enter.TotalValue);
+            var newPaymentDones = this.CalculPaymentDonesFromEnters(enters);
 
-                return page.Enters
-                    .SelectMany(enter => enter.Lines)
-                    .GroupBy(line => line.User)
-                    .Select(groupe => new PaymentDone()
-                    {
-                        PaymentIsDone = false,
-                        User = groupe.Key,
-                        Total = groupe.Sum(x => x.Value)
-                    }).
-                    ToList();
+            var newPaymentsDict = newPaymentDones.ToDictionary(p => (p.UserId, p.PageId));
+
+            var userIds = newPaymentDones.Select(p => p.UserId).ToList();
+            var pageIds = newPaymentDones.Select(p => p.PageId).ToList();
+
+            var existingPayments = await _context.PaymentDones
+                .Where(p => userIds.Contains(p.UserId) && pageIds.Contains(p.PageId))
+                .ToListAsync();
+
+            foreach (var existing in existingPayments)
+            {
+                if (newPaymentsDict.TryGetValue((existing.UserId, existing.PageId), out var newPayment))
+                {
+                    existing.Total = newPayment.Total;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return existingPayments;
+        }
+
+        public List<PaymentDone> CalculPaymentDonesFromEnters(IEnumerable<AccountEnter> enters)
+        {
+            if (enters.Any())
+            {
+                var payments = new List<PaymentDone>();
+                var enterByPage = enters.Where(e => e.IsDisabled == false).GroupBy(enter => enter.PageId).ToList();
+                foreach (var pageGroup in enterByPage)
+                {
+                    var paymentByPage = pageGroup
+                        .SelectMany(enter => enter.Lines)
+                        .GroupBy(line => line.User)
+                        .Select(groupe => new PaymentDone()
+                        {
+                            PageId = pageGroup.Key,
+                            PaymentIsDone = false,
+                            User = groupe.Key,
+                            UserId = groupe.Key.Id,
+                            Total = groupe.Sum(x => x.Value)
+                        })
+                        .ToList();
+                    payments.AddRange(paymentByPage);
+                }
+                return payments;
             }
             return [];
         }
@@ -73,6 +107,15 @@ namespace FamilyTools.EasyCompta.Business
             await this._context.SaveChangesAsync();
 
             return payment;
+        }
+
+        public async Task<List<PaymentDone>> GetListByPageId(int pageId)
+        {
+            if (pageId != default)
+            {
+                return await this._context.PaymentDones.Where(x => x.PageId == pageId).ToListAsync();
+            }
+            return [];
         }
     }
 }

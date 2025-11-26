@@ -6,9 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FamilyTools.EasyCompta.Business
 {
-    public class AccountEnterBusiness(EasyComptaContext context, IAccountLineBusiness lineBusiness) : BaseBusiness<AccountEnter>(context), IAccountEnterBusiness
+    public class AccountEnterBusiness(EasyComptaContext context, IAccountLineBusiness lineBusiness,IPaymentDoneBusiness paymentDoneBusiness) : BaseBusiness<AccountEnter>(context), IAccountEnterBusiness
     {
         private readonly IAccountLineBusiness _lineBusiness = lineBusiness;
+        private readonly IPaymentDoneBusiness _paymentDoneBusiness = paymentDoneBusiness;
         private AccountEnter AccountEnter = new();
 
         public override async Task<AccountEnter> Create(AccountEnter accountEnter)
@@ -94,6 +95,23 @@ namespace FamilyTools.EasyCompta.Business
             }
 
             return [];
+        }
+
+        public async Task<AccountEnter> DesabledEnter(int id, bool isDesable)
+        {
+            var enterUpdated = this._context.AccountEnters.Find(id);
+            if (enterUpdated == null)
+            {
+                return new AccountEnter();
+            }
+            enterUpdated.IsDisabled = isDesable;
+            enterUpdated = this._context.AccountEnters.Update(enterUpdated).Entity;
+            await this._context.SaveChangesAsync();
+
+            var enters = this._context.AccountEnters.Where(e => e.PageId == enterUpdated.PageId).ToList() ?? [];
+            await this._paymentDoneBusiness.UpdateListFromPage(enters);
+
+            return enterUpdated;
         }
 
         private void CalculTotalValue()

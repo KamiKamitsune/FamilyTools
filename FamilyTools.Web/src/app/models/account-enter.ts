@@ -22,8 +22,9 @@ export class AccountEnter extends BaseModel {
   operationType: OperationType;
   totalValue: number;
   date: Date;
+  isDisabled: boolean;
 
-  constructor(name: string, operationType: OperationType,  totalValue: number, tag: AccountTag, date: Date, lines: AccountLine[], id?: number, creationDate?: Date, updateDate?: Date){
+  constructor(name: string, operationType: OperationType,  totalValue: number, tag: AccountTag, date: Date, lines: AccountLine[], isDisabled: boolean, id?: number, creationDate?: Date, updateDate?: Date){
     super(id, creationDate, updateDate);
     this.lines = lines;
     this.tag = tag;
@@ -31,6 +32,7 @@ export class AccountEnter extends BaseModel {
     this.operationType = operationType;
     this.totalValue = totalValue;
     this.date = date;
+    this.isDisabled = isDisabled;
   }
 
     getTotal() : number{

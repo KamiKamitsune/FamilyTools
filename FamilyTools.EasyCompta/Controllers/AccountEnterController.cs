@@ -90,5 +90,25 @@ namespace FamilyTools.EasyCompta.Controllers
                 return this.BadRequest();
             }
         }
+
+        [Route("[action]/{id}")]
+        [HttpPatch]
+        public async Task<IActionResult> Desabled(int id, [FromBody]bool desabled)
+        {
+            try
+            {
+                var result = await this.business.DesabledEnter(id, desabled);
+                if (result == null)
+                {
+                    return this.NotFound();
+                }
+                return this.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex.Message);
+                return this.BadRequest(ex);
+            }
+        }
     }
 }
