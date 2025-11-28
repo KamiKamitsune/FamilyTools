@@ -38,6 +38,8 @@ export class AccountEnterComponent implements OnInit{
     value : [0, Validators.required]
   })
 
+  users = []; 
+
   //tester le formbuilder pour mettre une liste de line
   enter_form = this.formBuilder.group({
     tag : [-1, Validators.required],
@@ -141,6 +143,4 @@ export class AccountEnterComponent implements OnInit{
       this.lines.push(this.linesFormTemplate)
     }
   }
-
-
 }
