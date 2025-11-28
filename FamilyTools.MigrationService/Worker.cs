@@ -44,6 +44,7 @@ public class Worker(
         {
             // Run migration in a transaction to avoid partial migration if it fails.
             await dbContext.Database.MigrateAsync(cancellationToken);
+            await dbContext.EnsureSeedData();
         });
     }
 

@@ -5,9 +5,6 @@ using FamilyTools.Data.Seed.EasyCompta;
 
 using Microsoft.EntityFrameworkCore;
 
-
-
-
 namespace FamilyTools.Data.Context
 {
     public class EasyComptaContext(DbContextOptions<EasyComptaContext> options) : DbContext(options)

@@ -9,6 +9,7 @@ namespace FamilyTools.Data.Seed.EasyCompta
             List<IContextSeed> listSeed =
             [
                 new AccountTagSeed(context),
+                new UserSeed(context)
             ];
 
             foreach (IContextSeed contextSeed in listSeed)

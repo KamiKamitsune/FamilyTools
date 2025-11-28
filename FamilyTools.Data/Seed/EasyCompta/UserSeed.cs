@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using FamilyTools.Data.Context;
+﻿using FamilyTools.Data.Context;
 using FamilyTools.Data.Models.EasyCompta;
 
 namespace FamilyTools.Data.Seed.EasyCompta
@@ -22,7 +18,7 @@ namespace FamilyTools.Data.Seed.EasyCompta
                     UserName = "Jojo"
                 },
                 new(){
-                    FirstName = "Lili",
+                    FirstName = "Litani",
                     LastName = "Luthe",
                     UserName = "Lili"
                 }
