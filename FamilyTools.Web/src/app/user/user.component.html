@@ -33,7 +33,7 @@
               <td>
                 <div class="row-actions">
                   <button type="button"><span class="action-icon">✏️</span></button>
-                  <button type="button" (click)="DeleteUser(user.id)"><span class="action-icon">🗑️</span></button>
+                  <button type="button" (click)="DeleteUser(user.id!)"><span class="action-icon">🗑️</span></button>
                 </div>
               </td>
             </tr>
@@ -55,83 +55,7 @@
         <h2 class="card-title">Ajouter un nouvel utilisateur</h2>
       </div>
       
-      <form [formGroup]="userform" (ngSubmit)="CreateUser()">
-        <div class="form-container">
-          
-          <div class="form-section">
-
-              <div class="form-group">
-                <label class="form-label required-label">Prénom</label>
-                <input type="text" id="firstname" class="form-control" placeholder="Entrez le prénom" formControlName="firstname" required>
-              </div>
-              @if (firstname?.invalid && isSubmit) {
-                <div class="alert alert-danger">
-
-                  @if (firstname?.hasError('required')) {
-                    <div>
-                      Le prenom est requis
-                    </div>
-                  }
-
-                  @if (firstname?.hasError('minlength')) {
-                    <div>
-                      Le prenom doit comporter au moins 3 caractères.
-                    </div>
-                  }
-                </div>
-              }
-              
-              <div class="form-group">
-                <label class="form-label required-label">Nom</label>
-                <input type="text" class="form-control" placeholder="Entrez le nom" formControlName="lastname" required>
-
-                @if (lastname?.invalid  && isSubmit) {
-                <div class="alert alert-danger">
-
-                  @if (lastname?.hasError('required')) {
-                    <div>
-                      Le nom est requis
-                    </div>
-                  }
-
-                  @if (lastname?.hasError('minlength')) {
-                    <div>
-                      Le nom doit comporter au moins 3 caractères.
-                    </div>
-                  }
-                </div>
-              }
-              </div>
-            
-            <div class="form-group">
-              <label class="form-label required-label">Nom d'utilisateur</label>
-              <input type="text" class="form-control" placeholder="Entre le nom d'utilisateur" formControlName="username" required>
-
-              @if (username?.invalid  && isSubmit) {
-                <div class="alert alert-danger">
-
-                  @if (username?.hasError('required')) {
-                    <div>
-                      Le Nom d'utilisateur est requis
-                    </div>
-                  }
-
-                  @if (username?.hasError('minlength')) {
-                    <div>
-                      Le Nom d'utilisateur doit comporter au moins 3 caractères.
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-            
-          </div>
-        </div>
-        
-        <div class="actions">
-          <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
-        </div>
-      </form>
+      <app-user-form/>
     </div>
   </div>
 </body>
