@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { AccountTag } from '../../models/account-tag';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../../models/user';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,6 @@ export class AccountService {
 
   http = inject(HttpClient);
   all_tag : AccountTag[] = [];
-  all_user : User[]= [];
 
   constructor(){
     this.getTagListApi();

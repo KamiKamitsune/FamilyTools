@@ -40,7 +40,9 @@
         <p>Remplissez tous les champs obligatoires pour créer une nouvelle entrée comptable</p>
       </div>
 
-      <form class="form-container" id="accountForm" [formGroup]="enter_form" (ngsubmit)="createEnter()">
+      <app-account-enter-form/>
+
+      <!-- <form class="form-container" id="accountForm" [formGroup]="enter_form" (ngsubmit)="createEnter()">
         <div class="toolbar">
           <h3 style="color: var(--text); margin: 0;">Détails de l'entrée</h3>
         </div>
@@ -98,7 +100,7 @@
           </div>
         </div>
             
-          <!-- <div class="assignee-section">
+           <div class="assignee-section">
             <p style="margin-bottom: 10px; color: var(--text-muted); font-size: 14px;">
               Sélectionnez les personnes concernées par cette dépense
             </p>
@@ -130,11 +132,11 @@
                 </div>
               </label>
             </div>
-          </div> -->
+          </div> 
           <div class="validation-error">Veuillez sélectionner au moins une personne</div>
         </div>
 
-        <!-- <div class="preview-section" id="previewSection">
+         <div class="preview-section" id="previewSection">
           <div class="preview-placeholder">
             <span style="color: var(--text-muted); font-size: 16px;">👁️ L'aperçu apparaîtra ici lors de la saisie</span>
           </div>
@@ -153,7 +155,7 @@
               </div>
             </div>
           </div>
-        </div> -->
+        </div> 
 
         <div class="toolbar">
           <div class="action-buttons">
@@ -170,7 +172,7 @@
             </button>
           </div>
         </div>
-      </form>
+      </form> -->
     </div>
   </div>
 

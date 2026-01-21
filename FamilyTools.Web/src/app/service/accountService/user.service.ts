@@ -1,73 +1,53 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../../models/user';
 import { HttpClient } from '@angular/common/http';
+import { HttpHelperService } from '../httpHelper/http-helper.service';
+import { AppSetings } from '../../constants/app.constants';
+import { finalize, Observable, Subscriber } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService{
+export class UserService {
 
-  private http = inject(HttpClient);
-  
-  Users : User[] = [];
-  
-  UserSelected : User|undefined;
+  private helperService = inject(HttpHelperService);
 
   constructor(){
-    console.log("construc user service")
-    this.getUserListApi();
+    this.getUserListApi()
   }
 
-    public async getUserListApi(){
-    if(this.http)
-      {
-        this.http.get<User[]>('/api/user').subscribe({
-          next: result => this.Users = result,
-          error: console.error
-        });
-      }
+  Users = signal<User[]>([]);
+
+  public getUserListApi(){
+    return this.helperService.get<User[]>(`${AppSetings.USER_URL}`).subscribe({
+      next : result => result != null ? this.Users.set(result) : console.log("response void"),
+      error : error => console.log(error)
+    })
   }
 
-  public async createUserApi(user: User){
-    if(this.http)
-      {
-        this.http.post<User>('/api/user/create', user).subscribe({
-          next: result => {
-            console.log(`${result.firstName} ${result.lastName} a été ajouté`);
-            this.getUserListApi();
-          },
-          error: console.error
-        });
-      }
+  public async createUserApi(user: User) {
+    this.helperService.post(`${AppSetings.USER_URL}create`, user).pipe(
+      finalize(() => this.getUserListApi())
+    );
   }
 
-  public async deleteUserApi(id:number){
-    if(this.http)
-      {
-        this.http.delete<boolean>('/api/user/delete/' + id).subscribe({
-          next: result => result ? this.Users = this.Users.filter(user => user.id != id) : null,
-          error: console.error
-        });
-      }
+  public async deleteUserApi(id: number) {
+    this.helperService.delete(`${AppSetings.USER_URL}delete`, id).pipe(
+      finalize(() => this.getUserListApi())
+    );
   }
 
-  public async getUser(id:number){
-    if (this.http) {
-      this.http.get<User>('/api/user/index/' + id).subscribe({
-        next: result => this.UserSelected = result,
-        error: console.error
-      })
-    }
+  public async getUser(id: number){
+    return this.helperService.get<User>(`${AppSetings.USER_URL}index`, id).pipe(
+      finalize(() => this.getUserListApi())
+    );
   }
-  
-  public async updateUserApi(){
-    if(this.http)
-      {
-        this.http.put<User>('/api/user/edit', this.UserSelected).subscribe({
-          next: result => this.Users.map( user => user.id == result.id? user = result : null),
-          error: console.error
-        });
-      }
+
+  public async updateUserApi(user: User) {
+    return this.helperService.put<User>(`${AppSetings.USER_URL}edit`, user).pipe(
+      finalize(() => this.getUserListApi())
+    );
+
   }
 
 }

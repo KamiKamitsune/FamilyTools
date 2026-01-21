@@ -21,7 +21,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (tag of this.service.all_tag; track $index) {
+          @for (tag of this.service.allTag(); track tag) {
             <tr>
               <td>{{ tag.id }}</td>
               <td>{{ tag.name }}</td>
@@ -29,7 +29,7 @@
               <td>
                 <div class="row-actions">
                   <button type="button"><span class="action-icon">✏️</span></button>
-                  <button type="button" (click)="deleteTag(tag.id)"><span class="action-icon">🗑️</span></button>
+                  <button type="button" (click)="deleteTag(tag.id!)"><span class="action-icon">🗑️</span></button>
                 </div>
               </td>
             </tr>
@@ -50,55 +50,7 @@
       <div class="card-header">
         <h2 class="card-title">Ajouter un nouvel utilisateur</h2>
       </div>
-      
-      <form [formGroup]="tagForm" (ngSubmit)="createTag()">
-        <div class="form-container">
-          
-          <div class="form-section">
-
-              <div class="form-group">
-                <label class="form-label required-label">Nom</label>
-                <input type="text" id="name" class="form-control" placeholder="Entrez le nom" formControlName="name" required>
-              </div>
-              @if (name?.invalid && isSubmit) {
-                <div class="alert alert-danger">
-
-                  @if (name?.hasError('required')) {
-                    <div>
-                      Le prenom est requis
-                    </div>
-                  }
-
-                  @if (name?.hasError('minlength')) {
-                    <div>
-                      Le prenom doit comporter au moins 3 caractères.
-                    </div>
-                  }
-                </div>
-              }
-              
-              <div class="form-group">
-                <label class="form-label required-label">Couleur</label>
-                <input type="color" class="form-control" placeholder="selectionné une couleur" formControlName="color" required>
-
-                @if (color?.invalid  && isSubmit) {
-                <div class="alert alert-danger">
-
-                  @if (color?.hasError('required')) {
-                    <div>
-                      Le nom est requis
-                    </div>
-                  }
-                </div>
-              }
-              </div>            
-          </div>
-        </div>
-        
-        <div class="actions">
-          <button type="submit" class="btn btn-primary">Ajouter le Tag</button>
-        </div>
-      </form>
+      <app-tag-form/>
     </div>
   </div>
 </body>

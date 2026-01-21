@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AccountTag } from '../../models/account-tag';
-import { OPERATIONTYPESTRING } from './../../constants/app.constants'
+import { AppSetings, OPERATIONTYPESTRING } from './../../constants/app.constants'
 import { PaymentDone } from '../../models/payment-done';
 import { AccountEnter } from '../../models/account-enter';
 
@@ -39,7 +39,8 @@ export class AccountPageComponent implements OnInit {
 
   private get_all_month() {
     if (this._http) {
-      this._http.get<Date[]>('api/easycompta/AccountPage/getallmonth').subscribe({
+      // this._http.get<Date[]>('api/easycompta/AccountPage/getallmonth').subscribe({
+      this._http.get<Date[]>(`${AppSetings.PAGE_URL}getallmonth`).subscribe({
         next: result => {
           result.forEach(e => {
             this.date_list.push(new Date(e));

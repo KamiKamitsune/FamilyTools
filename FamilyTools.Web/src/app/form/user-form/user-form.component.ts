@@ -29,13 +29,7 @@ export class UserFormComponent {
 
       const credentials = this.userModel();
       console.log('User in with:', credentials)
-      var user = new User(
-        credentials.firstName,
-        credentials.lastName,
-        credentials.userName
-      )
+      this.service.createUserApi(credentials);
       this.userForm().reset();
-      this.service.createUserApi(user);
-
     }
 }

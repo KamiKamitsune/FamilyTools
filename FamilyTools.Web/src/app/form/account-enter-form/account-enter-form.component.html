@@ -1,0 +1,87 @@
+<form (submit)="onSubmit($event)">
+    <div class="form-container">
+
+        <div class="form-section">
+
+            <div class="form-group">
+                <label class="form-label required-label">tag
+                </label>
+                <select class="form-control" [field]="enterForm.tag.name">
+                    @for (tag of tagService.allTag(); track tag.id) {
+                    <option value="tag.id">{{ tag.name }}</option>
+                    }
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required-label">date
+                </label>
+                <input class="form-control" type="date" [field]="enterForm.date">
+
+                @if (enterForm.date().touched() && enterForm.date().invalid()) {
+                <div class="alert alert-danger">
+                    <ul>
+                        @for (error of enterForm.date().errors(); track error) {
+                        <li>{{ error.message }}</li>
+                        }
+                    </ul>
+                </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required-label">nom</label>
+                <input class="form-control" type="text" [field]="enterForm.name">
+
+                @if (enterForm.name().touched() && enterForm.name().invalid()) {
+                <div class="alert alert-danger">
+                    <ul>
+                        @for (error of enterForm.name().errors(); track error) {
+                        <li>{{ error.message }}</li>
+                        }
+                    </ul>
+                </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required-label">valeur total</label>
+                <input class="form-control" type="number" [field]="enterForm.totalValue">
+
+                @if (enterForm.totalValue().touched() && enterForm.totalValue().invalid()) {
+                <div class="alert alert-danger">
+                    <ul>
+                        @for (error of enterForm.totalValue().errors(); track error) {
+                        <li>{{ error.message }}</li>
+                        }
+                    </ul>
+                </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required-label">type d'operation</label>
+                <select class="form-control" type="number" [field]="enterForm.operationType">
+                    @for (operationType of OperationType | keyvalue; track $index) {
+                    <option [value]="operationType.value">{{ operationType.key }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label required-label">Désactivé</label>
+                <input class="form-control" type="checkbox" [field]="enterForm.isDisabled">
+            </div>
+
+            @for (line of this.enterModel().lines; track line) {
+                <app-account-line-form userId="{{ line.user.id }}" value="{{ line.value }}"/>
+            }
+
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
+    </div>
+</form>

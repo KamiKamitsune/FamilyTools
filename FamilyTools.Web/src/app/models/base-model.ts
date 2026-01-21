@@ -1,12 +1,6 @@
-export class BaseModel {
-  id: number;
+export interface BaseModel {
+  id?: number;
   creationDate?: Date;
   updateDate?: Date;
-
-  constructor(id: number = 0, creationDate?: Date, updateDate?: Date){
-    this.id = id;
-    this.creationDate = creationDate;
-    this.updateDate = updateDate;
-  }
 
 }
