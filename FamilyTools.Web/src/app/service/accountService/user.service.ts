@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, OnInit, signal } from '@angular/core';
 import { User } from '../../models/user';
 import { HttpClient } from '@angular/common/http';
 import { HttpHelperService } from '../httpHelper/http-helper.service';
@@ -8,15 +8,15 @@ import { finalize, Observable, Subscriber } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService{
 
   private helperService = inject(HttpHelperService);
 
   constructor(){
-    this.getUserListApi()
+    this.getUserListApi();
   }
 
-  Users = signal<User[]>([]);
+  readonly Users = signal<User[]>([]);
 
   public getUserListApi(){
     return this.helperService.get<User[]>(`${AppSetings.USER_URL}`).subscribe({

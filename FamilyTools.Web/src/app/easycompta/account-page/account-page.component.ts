@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, input, OnInit, ViewChild } from '@angular/core';
 import { AccountPage } from '../../models/account-page';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
@@ -22,7 +22,6 @@ export class AccountPageComponent implements OnInit {
   selectedFile: File | undefined;
   @ViewChild('addCsvButton', { static: false }) addCsvButton!: ElementRef<HTMLInputElement>;
   operationtype = OPERATIONTYPESTRING;
-
 
   private readonly _http = inject(HttpClient);
   private readonly router = inject(Router);
@@ -85,7 +84,7 @@ export class AccountPageComponent implements OnInit {
       formData.append('csvFile', this.selectedFile, this.selectedFile.name);
 
       this._http.post("api/easycompta/ImportCSV", formData).subscribe({
-        next: (response) => {
+        next: () => {
           this.addCsvButton.nativeElement.value = "";
           window.location.reload();
         },

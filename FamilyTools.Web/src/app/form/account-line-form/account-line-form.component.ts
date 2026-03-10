@@ -1,4 +1,4 @@
-import { Component, inject, Input, numberAttribute, Output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, Input, numberAttribute, Output, signal } from '@angular/core';
 import { AccountLine } from '../../models/account-line';
 import { UserService } from '../../service/accountService/user.service';
 import { form, required, Field } from '@angular/forms/signals';
@@ -11,17 +11,17 @@ import { User } from '../../models/user';
   templateUrl: './account-line-form.component.html',
   styleUrl: './account-line-form.component.css',
 })
-export class AccountLineFormComponent {
+export class AccountLineFormComponent{
 
-  @Input({ required: true, transform: numberAttribute} ) userId!: number;
-  @Input({ required: true , transform: numberAttribute} ) value!: number;
-  
+  user = input<User>();
+  value = input<number>(0);
+    
   userService = inject(UserService);
   enterService = inject(EnterService);
   
   lineModel = signal<AccountLine>({
-    user: this.userService.Users().find(x => x.id = this.userId) as User,
-    value: this.value
+    user: this.user()!,
+    value: this.value()
   });
   
   lineForm = form(this.lineModel, (schemaPath) => {
@@ -31,7 +31,12 @@ export class AccountLineFormComponent {
 
   constructor(){
     console.log("userComponent for ");
-    console.log(this.userId);
-    console.log(this.value);
+    console.log(this.user());
+    console.log(this.value());
+    console.log(this.userService.Users())
+
+    effect(() => {
+      
+    })
   }
 }

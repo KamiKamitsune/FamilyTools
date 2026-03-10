@@ -14,7 +14,7 @@ export const routes: Routes = [
                 path: 'account-page',
                 component: AccountPageComponent
             }, {
-                path: 'account-enter',
+                path: 'account-enter/:id',
                 component: AccountEnterComponent
             }, {
                 path: 'account-tag',
