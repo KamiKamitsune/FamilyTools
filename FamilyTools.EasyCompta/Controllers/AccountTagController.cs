@@ -1,98 +1,96 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
-
 using Microsoft.AspNetCore.Mvc;
 
-namespace FamilyTools.EasyCompta.Controllers
+namespace FamilyTools.EasyCompta.Controllers;
+
+[ApiController]
+[Route("easycompta/[controller]")]
+public class AccountTagController(IAccountTagBusiness business, ILogger<AccountTagController> logger) : ControllerBase
 {
-    [ApiController]
-    [Route("easycompta/[controller]")]
-    public class AccountTagController(IAccountTagBusiness business, ILogger<AccountTagController> logger) : ControllerBase
+    private readonly IAccountTagBusiness business = business;
+    private readonly ILogger<AccountTagController> logger = logger;
+
+
+    [Route("[action]")]
+    [Route("")]
+    [HttpGet]
+    public async Task<ActionResult> List()
     {
-        private readonly ILogger<AccountTagController> logger = logger;
-        private readonly IAccountTagBusiness business = business;
-
-
-        [Route("[action]")]
-        [Route("")]
-        [HttpGet]
-        public async Task<ActionResult> List()
+        try
         {
-            try
-            {
-                var tags = await this.business.TagList();
+            var tags = await this.business.TagList();
 
-                return this.Ok(tags);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            return this.Ok(tags);
         }
-
-        [Route("[action]/{id}")]
-        [HttpGet]
-        public async Task<IActionResult> Index(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                return this.Ok(await this.business.Find(id));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
+    }
 
-        [Route("[action]")]
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] AccountTag accounTag)
+    [Route("[action]/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> Index(int id)
+    {
+        try
         {
-            try
-            {
-                return this.Ok(await this.business.Create(accounTag));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            return this.Ok(await this.business.Find(id));
         }
-
-        [Route("[action]")]
-        [HttpPost]
-        [HttpPut]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromBody] AccountTag accounTag)
+        catch (Exception ex)
         {
-            try
-            {
-                return this.Ok(await this.business.Update(accounTag));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
+    }
 
-        [Route("[action]/{id}")]
-        [HttpGet]
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+    [Route("[action]")]
+    [HttpPost]
+    //[ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([FromBody] AccountTag accounTag)
+    {
+        try
         {
-            try
-            {
-                return this.Ok(await this.business.Delete(id));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            return this.Ok(await this.business.Create(accounTag));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
+        }
+    }
+
+    [Route("[action]")]
+    [HttpPost]
+    [HttpPut]
+    //[ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit([FromBody] AccountTag accounTag)
+    {
+        try
+        {
+            return this.Ok(await this.business.Update(accounTag));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
+        }
+    }
+
+    [Route("[action]/{id}")]
+    [HttpGet]
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            return this.Ok(await this.business.Delete(id));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
     }
 }

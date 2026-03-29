@@ -1,32 +1,31 @@
 ﻿using System.Threading.Channels;
 
-namespace FamilyTools.EasyCompta.Services
+namespace FamilyTools.EasyCompta.Services;
+
+public class DefaultBackgroundTaskQueue : IBackgroundCSVConvert
 {
-    public class DefaultBackgroundTaskQueue : IBackgroundCSVConvert
+    private readonly Channel<byte[]> _queue;
+
+    public DefaultBackgroundTaskQueue(int capacity)
     {
-        private readonly Channel<byte[]> _queue;
-
-        public DefaultBackgroundTaskQueue(int capacity)
+        BoundedChannelOptions options = new(capacity)
         {
-            BoundedChannelOptions options = new(capacity)
-            {
-                FullMode = BoundedChannelFullMode.Wait
-            };
-            _queue = Channel.CreateBounded<byte[]>(options);
-        }
+            FullMode = BoundedChannelFullMode.Wait
+        };
+        this._queue = Channel.CreateBounded<byte[]>(options);
+    }
 
-        public async ValueTask AddWorkItemInQueueBackgroundAsync(byte[] csvFiles)
-        {
-            ArgumentNullException.ThrowIfNull(csvFiles);
+    public async ValueTask AddWorkItemInQueueBackgroundAsync(byte[] csvFiles)
+    {
+        ArgumentNullException.ThrowIfNull(csvFiles);
 
-            await _queue.Writer.WriteAsync(csvFiles);
-        }
+        await this._queue.Writer.WriteAsync(csvFiles);
+    }
 
-        public async ValueTask<byte[]> DequeueAsync(CancellationToken cancellationToken)
-        {
-            var csvFiles = await _queue.Reader.ReadAsync(cancellationToken);
+    public async ValueTask<byte[]> DequeueAsync(CancellationToken cancellationToken)
+    {
+        var csvFiles = await this._queue.Reader.ReadAsync(cancellationToken);
 
-            return csvFiles;
-        }
+        return csvFiles;
     }
 }

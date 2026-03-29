@@ -1,8 +1,5 @@
 using System.Diagnostics;
-using System.Threading;
-
 using FamilyTools.Data.Context;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace FamilyTools.MigrationService;
@@ -11,7 +8,7 @@ public class Worker(
     ILogger<Worker> logger,
     IServiceProvider serviceProvider,
     IHostApplicationLifetime hostApplicationLifetime
-    ) : BackgroundService
+) : BackgroundService
 {
     public const string ActivitySourceName = "Migrations";
     private static readonly ActivitySource s_activitySource = new(ActivitySourceName);
@@ -47,5 +44,4 @@ public class Worker(
             await dbContext.EnsureSeedData();
         });
     }
-
 }

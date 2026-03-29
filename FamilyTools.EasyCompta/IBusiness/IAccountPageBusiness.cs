@@ -1,11 +1,10 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
 
-namespace FamilyTools.EasyCompta.IBusiness
+namespace FamilyTools.EasyCompta.IBusiness;
+
+public interface IAccountPageBusiness : IBaseBusiness<AccountPage>
 {
-    public interface IAccountPageBusiness : IBaseBusiness<AccountPage>
-    {
-        Task CreateOrUpdateListPage(List<AccountPage> pages);
-        Task<List<DateOnly>> GetAllMonth();
-        public Task<AccountPage> GetPageByDate(int month, int year);
-    }
+    Task CreateOrUpdateListPage(List<AccountPage> pages);
+    Task<List<DateOnly>> GetAllMonth();
+    public Task<AccountPage> GetPageByDate(int month, int year);
 }

@@ -1,19 +1,17 @@
 ﻿using FamilyTools.Data.Context;
 using FamilyTools.Data.Models.EasyCompta;
 
-namespace FamilyTools.Data.Seed.EasyCompta
+namespace FamilyTools.Data.Seed.EasyCompta;
+
+public class AccountTagSeed(EasyComptaContext EasyComptaContext) : IContextSeed
 {
-    public class AccountTagSeed(EasyComptaContext EasyComptaContext) : IContextSeed
+    public EasyComptaContext Context { get; set; } = EasyComptaContext;
+
+    public async Task Execute()
     {
-        public EasyComptaContext Context { get; set; } = EasyComptaContext;
+        if (this.Context.AccountTags.Any()) return;
 
-        public async Task Execute()
-        {
-            if (Context.AccountTags.Any()) return;
-
-            Context.AccountTags.Add(new AccountTag());
-            await Context.SaveChangesAsync();
-
-        }
+        this.Context.AccountTags.Add(new AccountTag());
+        await this.Context.SaveChangesAsync();
     }
 }

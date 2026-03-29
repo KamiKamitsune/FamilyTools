@@ -1,8 +1,7 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
 
-namespace FamilyTools.EasyCompta.IBusiness
+namespace FamilyTools.EasyCompta.IBusiness;
+
+public interface ITemplateBusiness : IBaseBusiness<Template>
 {
-    public interface ITemplateBusiness : IBaseBusiness<Template>
-    {
-    }
 }

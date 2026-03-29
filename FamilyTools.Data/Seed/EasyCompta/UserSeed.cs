@@ -1,32 +1,33 @@
 ﻿using FamilyTools.Data.Context;
 using FamilyTools.Data.Models.EasyCompta;
 
-namespace FamilyTools.Data.Seed.EasyCompta
+namespace FamilyTools.Data.Seed.EasyCompta;
+
+public class UserSeed(EasyComptaContext EasyComptaContext) : IContextSeed
 {
-    public class UserSeed(EasyComptaContext EasyComptaContext) : IContextSeed
+    public EasyComptaContext Context { get; set; } = EasyComptaContext;
+
+    public async Task Execute()
     {
-        public EasyComptaContext Context { get; set; } = EasyComptaContext;
+        if (this.Context.Users.Any()) return;
 
-        public async Task Execute()
+        var newUser = new List<User>
         {
-            if (this.Context.Users.Any()) return;
+            new()
+            {
+                FirstName = "John",
+                LastName = "Flagiu",
+                UserName = "Jojo"
+            },
+            new()
+            {
+                FirstName = "Litani",
+                LastName = "Luthe",
+                UserName = "Lili"
+            }
+        };
 
-            var newUser = new List<User>() {
-                new(){
-                    FirstName = "John",
-                    LastName = "Flagiu",
-                    UserName = "Jojo"
-                },
-                new(){
-                    FirstName = "Litani",
-                    LastName = "Luthe",
-                    UserName = "Lili"
-                }
-            }; 
-
-            this.Context.Users.AddRange(newUser);
-            await Context.SaveChangesAsync();
-
-        }
+        this.Context.Users.AddRange(newUser);
+        await this.Context.SaveChangesAsync();
     }
 }

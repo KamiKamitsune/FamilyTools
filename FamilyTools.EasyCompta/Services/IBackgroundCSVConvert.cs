@@ -1,10 +1,8 @@
-﻿namespace FamilyTools.EasyCompta.Services
+﻿namespace FamilyTools.EasyCompta.Services;
+
+public interface IBackgroundCSVConvert
 {
-    public interface IBackgroundCSVConvert
-    {
-        ValueTask AddWorkItemInQueueBackgroundAsync(byte[] csvFiles);
+    ValueTask AddWorkItemInQueueBackgroundAsync(byte[] csvFiles);
 
-        ValueTask<byte[]> DequeueAsync(CancellationToken cancellationToken);
-    }
+    ValueTask<byte[]> DequeueAsync(CancellationToken cancellationToken);
 }
-

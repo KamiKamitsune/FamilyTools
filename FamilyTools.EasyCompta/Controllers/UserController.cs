@@ -1,98 +1,96 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
-
 using Microsoft.AspNetCore.Mvc;
 
-namespace FamilyTools.EasyCompta.Controllers
+namespace FamilyTools.EasyCompta.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class UserController(IUserBusiness business, ILogger<UserController> logger) : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UserController(IUserBusiness business, ILogger<UserController> logger) : ControllerBase
+    private readonly IUserBusiness business = business;
+
+    private readonly ILogger<UserController> logger = logger;
+
+    [Route("[action]")]
+    [Route("")]
+    [HttpGet]
+    public async Task<ActionResult> List()
     {
-
-        private readonly ILogger<UserController> logger = logger;
-        private readonly IUserBusiness business = business;
-
-        [Route("[action]")]
-        [Route("")]
-        [HttpGet]
-        public async Task<ActionResult> List()
+        try
         {
-            try
-            {
-                var users = await this.business.UserList();
+            var users = await this.business.UserList();
 
-                return this.Ok(users);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            return this.Ok(users);
         }
-
-        [Route("[action]/{id}")]
-        [HttpGet]
-        public async Task<ActionResult> Index(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                return this.Ok(await this.business.Find(id));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
+    }
 
-        [Route("[action]")]
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] User user)
+    [Route("[action]/{id}")]
+    [HttpGet]
+    public async Task<ActionResult> Index(int id)
+    {
+        try
         {
-            try
-            {
-                return this.Ok(await this.business.Create(user));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest(ex.Message);
-            }
+            return this.Ok(await this.business.Find(id));
         }
-
-        [Route("[action]")]
-        [HttpPost]
-        [HttpPut]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([FromBody] User user)
+        catch (Exception ex)
         {
-            try
-            {
-                return this.Ok(await this.business.Update(user));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
+    }
 
-        [Route("[action]/{id}")]
-        [HttpGet]
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+    [Route("[action]")]
+    [HttpPost]
+    //[ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([FromBody] User user)
+    {
+        try
         {
-            try
-            {
-                return this.Ok(await this.business.Delete(id));
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            return this.Ok(await this.business.Create(user));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest(ex.Message);
+        }
+    }
+
+    [Route("[action]")]
+    [HttpPost]
+    [HttpPut]
+    //[ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit([FromBody] User user)
+    {
+        try
+        {
+            return this.Ok(await this.business.Update(user));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
+        }
+    }
+
+    [Route("[action]/{id}")]
+    [HttpGet]
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            return this.Ok(await this.business.Delete(id));
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
     }
 }

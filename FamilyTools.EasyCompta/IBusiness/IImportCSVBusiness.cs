@@ -1,9 +1,7 @@
-﻿
-namespace FamilyTools.EasyCompta.IBusiness
+﻿namespace FamilyTools.EasyCompta.IBusiness;
+
+public interface IImportCSVBusiness
 {
-    public interface IImportCSVBusiness
-    {
-        Task CSVToAccountPages(byte[] csvFile);
-        Task<bool> ImportCSVFile(IFormFile csvFile);
-    }
+    Task CSVToAccountPages(byte[] csvFile);
+    Task<bool> ImportCSVFile(IFormFile csvFile);
 }

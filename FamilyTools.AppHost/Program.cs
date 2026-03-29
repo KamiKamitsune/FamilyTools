@@ -1,3 +1,5 @@
+using Projects;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
@@ -10,12 +12,12 @@ var sql = builder.AddSqlServer("FamilyTools", port: 14329)
 //var backgroundService = builder.AddProject<Projects.FamilyTools_BackgroundService>("BackgroundService");
 
 
-var migration = builder.AddProject<Projects.FamilyTools_MigrationService>("migrations")
+var migration = builder.AddProject<FamilyTools_MigrationService>("migrations")
     .WithReference(sql)
-        .WaitFor(sql);
+    .WaitFor(sql);
 
 var easyComptaAPI = builder
-    .AddProject<Projects.FamilyTools_EasyCompta>(name: "EasyComptaAPI")
+    .AddProject<FamilyTools_EasyCompta>("EasyComptaAPI")
     .WithReference(sql)
     .WithReference(migration)
     .WaitForCompletion(migration)

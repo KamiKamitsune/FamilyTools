@@ -1,12 +1,10 @@
-﻿
-using FamilyTools.Data.Context;
+﻿using FamilyTools.Data.Context;
 
-namespace FamilyTools.Data.Seed.EasyCompta
+namespace FamilyTools.Data.Seed.EasyCompta;
+
+public interface IContextSeed
 {
-    public interface IContextSeed
-    {
-        EasyComptaContext Context { get; set; }
+    EasyComptaContext Context { get; set; }
 
-        Task Execute();
-    }
+    Task Execute();
 }

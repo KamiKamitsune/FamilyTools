@@ -1,9 +1,8 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
 
-namespace FamilyTools.EasyCompta.IBusiness
+namespace FamilyTools.EasyCompta.IBusiness;
+
+public interface IUserBusiness : IBaseBusiness<User>
 {
-    public interface IUserBusiness : IBaseBusiness<User>
-    {
-        Task<List<User>> UserList();
-    }
+    Task<List<User>> UserList();
 }

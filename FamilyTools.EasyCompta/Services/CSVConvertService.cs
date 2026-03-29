@@ -1,55 +1,49 @@
-﻿
-using FamilyTools.Data.Context;
-using FamilyTools.EasyCompta.Business;
-using FamilyTools.EasyCompta.IBusiness;
+﻿using FamilyTools.EasyCompta.IBusiness;
 
-namespace FamilyTools.EasyCompta.Services
+namespace FamilyTools.EasyCompta.Services;
+
+public sealed class CSVConvertService(
+    IBackgroundCSVConvert taskQueue,
+    ILogger<CSVConvertService> logger,
+    IServiceScopeFactory scopeFactory) : BackgroundService
 {
-    public sealed class CSVConvertService(
-        IBackgroundCSVConvert taskQueue,
-        ILogger<CSVConvertService> logger,
-        IServiceScopeFactory scopeFactory) : BackgroundService
+    private readonly ILogger<CSVConvertService> _logger = logger;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly IBackgroundCSVConvert _taskQueue = taskQueue;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        private readonly IBackgroundCSVConvert _taskQueue = taskQueue;
-        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
-        private readonly ILogger<CSVConvertService> _logger = logger;
+        this._logger.LogInformation("""
+                                    {Name} is running.
+                                    Tap W to add a work item to the 
+                                    background queue.
+                                    """,
+            nameof(CSVConvertService));
 
-        protected async override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("""
-            {Name} is running.
-            Tap W to add a work item to the 
-            background queue.
-            """,
-                nameof(CSVConvertService));
-
-            while (!stoppingToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                try
-                {
-                    var csvFiles = await _taskQueue.DequeueAsync(stoppingToken);
+                var csvFiles = await this._taskQueue.DequeueAsync(stoppingToken);
 
-                    using var scope = _scopeFactory.CreateScope();
-                    var importCsvBusiness = scope.ServiceProvider.GetRequiredService<IImportCSVBusiness>();
-                    await importCsvBusiness.CSVToAccountPages(csvFiles);
-                }
-                catch (OperationCanceledException)
-                {
-                    // Prevent throwing if stoppingToken was signaled
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred executing task work item.");
-                }
+                using var scope = this._scopeFactory.CreateScope();
+                var importCsvBusiness = scope.ServiceProvider.GetRequiredService<IImportCSVBusiness>();
+                await importCsvBusiness.CSVToAccountPages(csvFiles);
             }
-        }
+            catch (OperationCanceledException)
+            {
+                // Prevent throwing if stoppingToken was signaled
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, "Error occurred executing task work item.");
+            }
+    }
 
-        public override async Task StopAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation(
-                $"{nameof(CSVConvertService)} is stopping.");
+    public override async Task StopAsync(CancellationToken stoppingToken)
+    {
+        this._logger.LogInformation(
+            $"{nameof(CSVConvertService)} is stopping.");
 
-            await base.StopAsync(stoppingToken);
-        }
+        await base.StopAsync(stoppingToken);
     }
 }

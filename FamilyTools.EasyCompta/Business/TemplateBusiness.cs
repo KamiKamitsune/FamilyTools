@@ -2,9 +2,8 @@
 using FamilyTools.Data.Models.EasyCompta;
 using FamilyTools.EasyCompta.IBusiness;
 
-namespace FamilyTools.EasyCompta.Business
+namespace FamilyTools.EasyCompta.Business;
+
+public class TemplateBusiness(EasyComptaContext context) : BaseBusiness<Template>(context), ITemplateBusiness
 {
-    public class TemplateBusiness(EasyComptaContext context) : BaseBusiness<Template>(context), ITemplateBusiness
-    {
-    }
 }

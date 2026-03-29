@@ -1,5 +1,5 @@
-using FamilyTools.MigrationService;
 using FamilyTools.Data.Context;
+using FamilyTools.MigrationService;
 
 var builder = Host.CreateApplicationBuilder(args);
 

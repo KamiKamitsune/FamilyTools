@@ -1,65 +1,62 @@
 ﻿using FamilyTools.EasyCompta.IBusiness;
-
 using Microsoft.AspNetCore.Mvc;
 
-namespace FamilyTools.EasyCompta.Controllers
+namespace FamilyTools.EasyCompta.Controllers;
+
+[ApiController]
+[Route("easycompta/[controller]")]
+public class AccountPageController(IAccountPageBusiness business, ILogger<AccountPageController> logger)
+    : ControllerBase
 {
+    private readonly IAccountPageBusiness business = business;
+    private readonly ILogger<AccountPageController> logger = logger;
 
-    [ApiController]
-    [Route("easycompta/[controller]")]
-    public class AccountPageController(IAccountPageBusiness business, ILogger<AccountPageController> logger) : ControllerBase
+    [Route("")]
+    [Route("[action]")]
+    [HttpGet]
+    public async Task<IActionResult> Index()
     {
-
-        private readonly IAccountPageBusiness business = business;
-        private readonly ILogger<AccountPageController> logger = logger;
-
-        [Route("")]
-        [Route("[action]")]
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        try
         {
-            try
-            {
-                var date = DateTime.Now;
-                var result = await this.business.GetPageByDate(date.Month, date.Year);
-                return this.Ok(result);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            var date = DateTime.Now;
+            var result = await this.business.GetPageByDate(date.Month, date.Year);
+            return this.Ok(result);
         }
-
-        [Route("[action]/{month}/{year}")]
-        [HttpGet]
-        public async Task<IActionResult> Get(int month, int year)
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await this.business.GetPageByDate(month, year);
-                return this.Ok(result);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
+    }
 
-        [Route("[action]")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllMonth()
+    [Route("[action]/{month}/{year}")]
+    [HttpGet]
+    public async Task<IActionResult> Get(int month, int year)
+    {
+        try
         {
-            try
-            {
-                return this.Ok(await this.business.GetAllMonth());
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex.Message);
-                return this.BadRequest();
-            }
+            var result = await this.business.GetPageByDate(month, year);
+            return this.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
+        }
+    }
+
+    [Route("[action]")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllMonth()
+    {
+        try
+        {
+            return this.Ok(await this.business.GetAllMonth());
+        }
+        catch (Exception ex)
+        {
+            this.logger.LogError(ex.Message);
+            return this.BadRequest();
         }
     }
 }
