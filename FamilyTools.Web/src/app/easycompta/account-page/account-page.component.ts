@@ -4,9 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { AccountTag } from '../../models/account-tag';
-import { AppSetings, OPERATIONTYPESTRING } from './../../constants/app.constants'
 import { PaymentDone } from '../../models/payment-done';
 import { AccountEnter } from '../../models/account-enter';
+import {AppSetings} from '../../constants/app.constants';
 
 @Component({
   selector: 'app-accountpage',
@@ -21,7 +21,6 @@ export class AccountPageComponent implements OnInit {
   current_tags: AccountTag[] = [];
   selectedFile: File | undefined;
   @ViewChild('addCsvButton', { static: false }) addCsvButton!: ElementRef<HTMLInputElement>;
-  operationtype = OPERATIONTYPESTRING;
 
   private readonly _http = inject(HttpClient);
   private readonly router = inject(Router);

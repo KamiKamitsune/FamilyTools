@@ -1,8 +1,11 @@
-import { Component, inject} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { EnterService } from '../../service/accountService/enter.service.service';
-import { AccountEnterFormComponent } from '../../form/account-enter-form/account-enter-form.component';
+import {Component, computed, effect, inject} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {FormBuilder} from '@angular/forms';
+import {EnterService} from '../../service/accountService/enter.service.service';
+import {AccountEnterFormComponent} from '../../form/account-enter-form/account-enter-form.component';
+import {ActivatedRoute, Router} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {AccountEnter} from '../../models/account-enter';
 
 @Component({
   selector: 'app-accountenter',
@@ -12,11 +15,14 @@ import { AccountEnterFormComponent } from '../../form/account-enter-form/account
 })
 
 export class AccountEnterComponent{
-  
+
   readonly enterService = inject(EnterService);
   private readonly http = inject(HttpClient);
   private formBuilder = inject(FormBuilder);
 
+  private route = inject(ActivatedRoute);
+  private data = toSignal(this.route.data, { requireSync: true });
+  enter = computed(() => this.data()['enter'] as AccountEnter);
 
   // enter! : AccountEnter;
 
@@ -37,7 +43,7 @@ export class AccountEnterComponent{
   //   value : [0, Validators.required]
   // })
 
-  // users = []; 
+  // users = [];
 
   //tester le formbuilder pour mettre une liste de line
   // enter_form = this.formBuilder.group({
@@ -92,7 +98,7 @@ export class AccountEnterComponent{
   //   })
   // }
 
-  // enterFormToEnter(){ 
+  // enterFormToEnter(){
 
   //   this.enter.name = this.name?.value as string;
   //   this.enter.totalValue = Number(this.totalValue?.value);
@@ -100,13 +106,13 @@ export class AccountEnterComponent{
   //   this.enter.date = new Date(this.date?.value as string);
 
   //   this.enter.lines = this.lines.controls.map(line => new AccountLine(
-  //     this.service.all_user.find(user => user.id = Number(line.get("user")?.value)) as User, 
+  //     this.service.all_user.find(user => user.id = Number(line.get("user")?.value)) as User,
   //     line.get("value")?.value)
   //   );
   // }
 
   // changeValueForOneLines(userId: number, value: number){
-    
+
   //   this.enter.lines.forEach(line => line.user.id == userId ? line.value = value : line.value);
 
   //   if (!this.id_user_modifier.includes(userId)) {
@@ -116,7 +122,7 @@ export class AccountEnterComponent{
   //   let total = this.enter.totalValue;
 
   //   this.enter.lines.forEach(line => {
-  //     if (line.user.id) {        
+  //     if (line.user.id) {
   //       if (this.id_user_modifier.includes(line.user.id)) {
   //         total -= line.value;
   //       }
@@ -131,15 +137,15 @@ export class AccountEnterComponent{
   //     this.error_total_and_value == true;
   //   }
   // }
-
+  //
   // deleteLine(idLien : number){
   //   this.enter.lines.filter(line => line.id == idLien).pop();
   // }
-
+  //
   // addLine(id_user : number, value : number){
-
+  //
   //   let user_find = this.service.all_user.find(user => user.id == id_user);
-
+  //
   //   if (user_find) {
   //     this.lines.push(this.linesFormTemplate)
   //   }

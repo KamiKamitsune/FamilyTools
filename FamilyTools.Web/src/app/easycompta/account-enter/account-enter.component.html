@@ -7,179 +7,179 @@
 </head>
 
 <body>
-  <div class="app-container">
-    <div class="header">
-      <div>
-        <h1>Ajouter une Entrée</h1>
-        <div class="breadcrumb">
-          <a href="#" onclick="goBack()">← Tableau de bord</a>
-          <span>/</span>
-          <span>Nouvelle entrée</span>
-        </div>
+<div class="app-container">
+  <div class="header">
+    <div>
+      <h1>Ajouter une Entrée</h1>
+      <div class="breadcrumb">
+        <a href="#" onclick="goBack()">← Tableau de bord</a>
+        <span>/</span>
+        <span>Nouvelle entrée</span>
       </div>
     </div>
+  </div>
 
-    <div class="navigation-tabs">
-      <div class="tab active">Nouvelle entrée</div>
-      <div class="tab">Aperçu</div>
+  <div class="navigation-tabs">
+    <div class="tab active">Nouvelle entrée</div>
+    <div class="tab">Aperçu</div>
+  </div>
+
+  <div class="form-tips">
+    <h3>💡 Conseils pour une saisie optimale</h3>
+    <ul>
+      <li>Utilisez des descriptions claires et précises</li>
+      <li>Vérifiez le montant avant validation</li>
+      <li>Assignez correctement les personnes concernées</li>
+      <li>La date par défaut est aujourd'hui</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Informations de l'entrée</h2>
+      <p>Remplissez tous les champs obligatoires pour créer une nouvelle entrée comptable</p>
     </div>
 
-    <div class="form-tips">
-      <h3>💡 Conseils pour une saisie optimale</h3>
-      <ul>
-        <li>Utilisez des descriptions claires et précises</li>
-        <li>Vérifiez le montant avant validation</li>
-        <li>Assignez correctement les personnes concernées</li>
-        <li>La date par défaut est aujourd'hui</li>
-      </ul>
-    </div>
+    <app-account-enter-form [enter]="enter()"/>
 
-    <div class="card">
-      <div class="card-header">
-        <h2>Informations de l'entrée</h2>
-        <p>Remplissez tous les champs obligatoires pour créer une nouvelle entrée comptable</p>
+    <!-- <form class="form-container" id="accountForm" [formGroup]="enter_form" (ngsubmit)="createEnter()">
+      <div class="toolbar">
+        <h3 style="color: var(--text); margin: 0;">Détails de l'entrée</h3>
       </div>
 
-      <app-account-enter-form/>
-
-      <!-- <form class="form-container" id="accountForm" [formGroup]="enter_form" (ngsubmit)="createEnter()">
-        <div class="toolbar">
-          <h3 style="color: var(--text); margin: 0;">Détails de l'entrée</h3>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label">nom <span class="required">*</span></label>
+          <input type="text" class="form-control" id="name" placeholder="Entrez un nom" formControlName="name"
+                 required>
+          <div class="validation-error">La description est obligatoire</div>
         </div>
 
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label class="form-label">nom <span class="required">*</span></label>
-            <input type="text" class="form-control" id="name" placeholder="Entrez un nom" formControlName="name"
-              required>
-            <div class="validation-error">La description est obligatoire</div>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Catégorie <span class="required">*</span></label>
+          <select class="form-select" id="category" required>
+            <option value="">Sélectionner une catégorie</option>
+            @for (tag of this.service.all_tag; track $index) {
+            <option value="{{ tag.id }}"> {{ tag.name }}</option>
+            }
+          </select>
+          <div class="validation-error">Veuillez sélectionner une catégorie</div>
+        </div>
 
-          <div class="form-group">
-            <label class="form-label">Catégorie <span class="required">*</span></label>
-            <select class="form-select" id="category" required>
-              <option value="">Sélectionner une catégorie</option>
-              @for (tag of this.service.all_tag; track $index) {
-              <option value="{{ tag.id }}"> {{ tag.name }}</option>
-              }
-            </select>
-            <div class="validation-error">Veuillez sélectionner une catégorie</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Montant total<span class="required">*</span></label>
-            <div class="currency-input">
-              <input type="number" step="0.01" class="form-control" id="totalValue" placeholder="0.00"
-                formControlName="totalValue" required>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Date</label>
-            <input type="date" class="form-control" id="date" formControlName="date" required>
+        <div class="form-group">
+          <label class="form-label">Montant total<span class="required">*</span></label>
+          <div class="currency-input">
+            <input type="number" step="0.01" class="form-control" id="totalValue" placeholder="0.00"
+                   formControlName="totalValue" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Assigné à <span class="required">*</span></label>
-          
-          <div class="assignee-section">
-            <p style="margin-bottom: 10px; color: var(--text-muted); font-size: 14px;">
-              Sélectionnez les personnes concernées par cette dépense
-            </p>
-            <div class="assignee-grid">
-          @for (line of this.enter.lines; track $index) {
-              <label class="assignee-option">
-                <input type="checkbox" name="assignee" value="{{ line.user.userName }}" id="assignee">
-                <div class="summary-avatar">{{ line.user.userName[0] }}</div>
-                <div class="assignee-info">
-                  <div class="assignee-name">{{ line.user.userName }}</div>
-                </div>
-              </label>
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" formControlName="date" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Assigné à <span class="required">*</span></label>
+
+        <div class="assignee-section">
+          <p style="margin-bottom: 10px; color: var(--text-muted); font-size: 14px;">
+            Sélectionnez les personnes concernées par cette dépense
+          </p>
+          <div class="assignee-grid">
+            @for (line of this.enter.lines; track $index) {
+            <label class="assignee-option">
+              <input type="checkbox" name="assignee" value="{{ line.user.userName }}" id="assignee">
+              <div class="summary-avatar">{{ line.user.userName[0] }}</div>
+              <div class="assignee-info">
+                <div class="assignee-name">{{ line.user.userName }}</div>
+              </div>
+            </label>
             }
           </div>
         </div>
-            
-           <div class="assignee-section">
-            <p style="margin-bottom: 10px; color: var(--text-muted); font-size: 14px;">
-              Sélectionnez les personnes concernées par cette dépense
-            </p>
-            <div class="assignee-grid">
-              <label class="assignee-option">
-                <input type="checkbox" name="assignee" value="pierre" id="assignee-pierre">
-                <div class="summary-avatar">P</div>
-                <div class="assignee-info">
-                  <div class="assignee-name">Pierre</div>
-                  <div class="assignee-role">Administrateur</div>
-                </div>
-              </label>
 
-              <label class="assignee-option">
-                <input type="checkbox" name="assignee" value="marie" id="assignee-marie">
-                <div class="summary-avatar" style="background-color: var(--warning);">M</div>
-                <div class="assignee-info">
-                  <div class="assignee-name">Marie</div>
-                  <div class="assignee-role">Utilisateur</div>
-                </div>
-              </label>
-
-              <label class="assignee-option">
-                <input type="checkbox" name="assignee" value="jean" id="assignee-jean">
-                <div class="summary-avatar" style="background-color: var(--success);">J</div>
-                <div class="assignee-info">
-                  <div class="assignee-name">Jean</div>
-                  <div class="assignee-role">Utilisateur</div>
-                </div>
-              </label>
-            </div>
-          </div> 
-          <div class="validation-error">Veuillez sélectionner au moins une personne</div>
-        </div>
-
-         <div class="preview-section" id="previewSection">
-          <div class="preview-placeholder">
-            <span style="color: var(--text-muted); font-size: 16px;">👁️ L'aperçu apparaîtra ici lors de la saisie</span>
-          </div>
-          <div class="preview-content" id="previewContent">
-            <div class="preview-item">
-              <strong id="previewDescription">Description</strong>
-              <div class="preview-meta">
-                <span class="tag-icon" id="previewCategoryIcon">📝</span>
-                <span id="previewCategory">Catégorie</span> • 
-                <span class="numeric-value" id="previewAmount">0,00 €</span> • 
-                <span id="previewDate">Date</span>
+        <div class="assignee-section">
+          <p style="margin-bottom: 10px; color: var(--text-muted); font-size: 14px;">
+            Sélectionnez les personnes concernées par cette dépense
+          </p>
+          <div class="assignee-grid">
+            <label class="assignee-option">
+              <input type="checkbox" name="assignee" value="pierre" id="assignee-pierre">
+              <div class="summary-avatar">P</div>
+              <div class="assignee-info">
+                <div class="assignee-name">Pierre</div>
+                <div class="assignee-role">Administrateur</div>
               </div>
-              <div style="margin-top: 10px;">
-                <span style="font-size: 12px; color: var(--text-muted);">Assigné à:</span>
-                <div id="previewAssignees" style="margin-top: 5px;"></div>
-              </div>
-            </div>
-          </div>
-        </div> 
+            </label>
 
-        <div class="toolbar">
-          <div class="action-buttons">
-            <button type="button" class="btn btn-secondary" onclick="resetForm()">
-              🔄 Réinitialiser
-            </button>
-          </div>
-          <div class="action-buttons">
-            <button type="button" class="btn btn-secondary" onclick="goBack()">
-              Annuler
-            </button>
-            <button type="submit" class="btn btn-primary">
-              💾 Enregistrer l'entrée
-            </button>
+            <label class="assignee-option">
+              <input type="checkbox" name="assignee" value="marie" id="assignee-marie">
+              <div class="summary-avatar" style="background-color: var(--warning);">M</div>
+              <div class="assignee-info">
+                <div class="assignee-name">Marie</div>
+                <div class="assignee-role">Utilisateur</div>
+              </div>
+            </label>
+
+            <label class="assignee-option">
+              <input type="checkbox" name="assignee" value="jean" id="assignee-jean">
+              <div class="summary-avatar" style="background-color: var(--success);">J</div>
+              <div class="assignee-info">
+                <div class="assignee-name">Jean</div>
+                <div class="assignee-role">Utilisateur</div>
+              </div>
+            </label>
           </div>
         </div>
-      </form> -->
-    </div>
+        <div class="validation-error">Veuillez sélectionner au moins une personne</div>
+      </div>
+
+      <div class="preview-section" id="previewSection">
+        <div class="preview-placeholder">
+          <span style="color: var(--text-muted); font-size: 16px;">👁️ L'aperçu apparaîtra ici lors de la saisie</span>
+        </div>
+        <div class="preview-content" id="previewContent">
+          <div class="preview-item">
+            <strong id="previewDescription">Description</strong>
+            <div class="preview-meta">
+              <span class="tag-icon" id="previewCategoryIcon">📝</span>
+              <span id="previewCategory">Catégorie</span> •
+              <span class="numeric-value" id="previewAmount">0,00 €</span> •
+              <span id="previewDate">Date</span>
+            </div>
+            <div style="margin-top: 10px;">
+              <span style="font-size: 12px; color: var(--text-muted);">Assigné à:</span>
+              <div id="previewAssignees" style="margin-top: 5px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="action-buttons">
+          <button type="button" class="btn btn-secondary" onclick="resetForm()">
+            🔄 Réinitialiser
+          </button>
+        </div>
+        <div class="action-buttons">
+          <button type="button" class="btn btn-secondary" onclick="goBack()">
+            Annuler
+          </button>
+          <button type="submit" class="btn btn-primary">
+            💾 Enregistrer l'entrée
+          </button>
+        </div>
+      </div>
+    </form> -->
   </div>
+</div>
 
-  <!-- <script>
+<!-- <script>
     // Initialisation de la date actuelle
     document.getElementById('date').valueAsDate = new Date();
-    
+
     // Mapping des icônes par catégorie
     const categoryIcons = {
       'électricité': '⚡',
@@ -191,7 +191,7 @@
       'restaurant': '🍽️',
       'autre': '📝'
     };
-    
+
     // Gestion de l'aperçu en temps réel
     function updatePreview() {
       const description = document.getElementById('description').value;
@@ -200,17 +200,17 @@
       const date = document.getElementById('date').value;
       const assignees = Array.from(document.querySelectorAll('input[name="assignee"]:checked'))
         .map(checkbox => checkbox.nextElementSibling.nextElementSibling.querySelector('.assignee-name').textContent);
-      
+
       const previewSection = document.getElementById('previewSection');
       const previewContent = document.getElementById('previewContent');
       const placeholder = previewSection.querySelector('.preview-placeholder');
-      
+
       if (description || category || amount || assignees.length > 0) {
         placeholder.style.display = 'none';
         previewContent.classList.add('show');
-        
+
         document.getElementById('previewDescription').textContent = description || 'Description';
-        
+
         // Gestion de l'icône et du texte de catégorie
         const categoryIcon = document.getElementById('previewCategoryIcon');
         if (category && categoryIcons[category]) {
@@ -218,20 +218,20 @@
         } else {
           categoryIcon.textContent = '📝';
         }
-        
+
         const categoryText = category ? document.querySelector(`option[value="${category}"]`).textContent.replace(/^[^\s]+ /, '') : 'Catégorie';
         document.getElementById('previewCategory').textContent = categoryText;
-        
+
         const amountText = amount ? parseFloat(amount).toFixed(2) + ' €' : '0,00 €';
         document.getElementById('previewAmount').textContent = amountText;
-        
+
         const dateText = date ? new Date(date).toLocaleDateString('fr-FR') : 'Date';
         document.getElementById('previewDate').textContent = dateText;
-        
+
         // Affichage des assignés avec chips
         const assigneesContainer = document.getElementById('previewAssignees');
         if (assignees.length > 0) {
-          assigneesContainer.innerHTML = assignees.map(name => 
+          assigneesContainer.innerHTML = assignees.map(name =>
             `<span class="assignee-chip">${name}</span>`
           ).join('');
         } else {
@@ -242,7 +242,7 @@
         previewContent.classList.remove('show');
       }
     }
-    
+
     // Écouteurs d'événements pour l'aperçu
     document.getElementById('description').addEventListener('input', updatePreview);
     document.getElementById('category').addEventListener('change', updatePreview);
@@ -251,35 +251,35 @@
     document.querySelectorAll('input[name="assignee"]').forEach(checkbox => {
       checkbox.addEventListener('change', updatePreview);
     });
-    
+
     // Validation du formulaire
     function validateForm() {
       let isValid = true;
-      
+
       // Reset des erreurs
       document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-      
+
       // Validation description
       const description = document.getElementById('description');
       if (!description.value.trim()) {
         description.classList.add('error');
         isValid = false;
       }
-      
+
       // Validation catégorie
       const category = document.getElementById('category');
       if (!category.value) {
         category.classList.add('error');
         isValid = false;
       }
-      
+
       // Validation montant
       const amount = document.getElementById('amount');
       if (!amount.value || parseFloat(amount.value) <= 0) {
         amount.classList.add('error');
         isValid = false;
       }
-      
+
       // Validation assignees
       const assignees = document.querySelectorAll('input[name="assignee"]:checked');
       const assigneeSection = document.querySelector('.assignee-section');
@@ -287,14 +287,14 @@
         assigneeSection.classList.add('error');
         isValid = false;
       }
-      
+
       return isValid;
     }
-    
+
     // Soumission du formulaire
     document.getElementById('accountForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
+
       if (validateForm()) {
         // Simulation de l'enregistrement
         const formData = {
@@ -305,29 +305,29 @@
           assignees: Array.from(document.querySelectorAll('input[name="assignee"]:checked'))
             .map(checkbox => checkbox.value)
         };
-        
+
         console.log('Données à enregistrer:', formData);
-        
+
         // Simulation d'un succès
         alert('✅ Entrée enregistrée avec succès !');
-        
+
         // Redirection vers le tableau de bord (simulation)
         // window.location.href = '/dashboard';
       }
     });
-    
+
     // Réinitialisation du formulaire
     function resetForm() {
       if (confirm('Êtes-vous sûr de vouloir réinitialiser le formulaire ?')) {
         document.getElementById('accountForm').reset();
         document.getElementById('date').valueAsDate = new Date();
         updatePreview();
-        
+
         // Suppression des erreurs
         document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
       }
     }
-    
+
     // Retour en arrière
     function goBack() {
       if (confirm('Êtes-vous sûr de vouloir quitter ? Les modifications non sauvegardées seront perdues.')) {
@@ -335,13 +335,13 @@
         console.log('Retour au tableau de bord');
       }
     }
-    
+
     // Gestion des onglets
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         this.classList.add('active');
-        
+
         if (this.textContent.includes('Aperçu')) {
           updatePreview();
         }

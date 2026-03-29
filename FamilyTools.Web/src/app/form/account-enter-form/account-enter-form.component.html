@@ -1,100 +1,104 @@
 <form (submit)="onSubmit($event)">
-    <div class="form-container">
+  <div class="form-container">
 
-        <div class="form-section">
+    <div class="form-section">
 
-            <div class="form-group">
-                <label class="form-label required-label">tag
-                </label>
-                <select class="form-control" [field]="enterForm.tag.name">
-                    @for (tag of tagService.allTag(); track tag.id) {
-                    <option value="tag.id">{{ tag.name }}</option>
-                    }
-                </select>
+      <div class="form-group">
+        <label class="form-label required-label">
+          tag
+        </label>
+        <select [formField]="enterForm.tag.name" class="form-control">
+          @for (tag of tagService.allTag(); track tag.id) {
+            <option value="tag.id">{{ tag.name }}</option>
+          }
+        </select>
 
-            </div>
+      </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">date
-                </label>
-                <input class="form-control" type="date" [field]="enterForm.date">
+      <div class="form-group">
+        <label class="form-label required-label">
+          date
+        </label>
+        <input [formField]="enterForm.date" class="form-control" type="date">
 
-                @if (enterForm.date().touched() && enterForm.date().invalid()) {
-                <div class="alert alert-danger">
-                    <ul>
-                        @for (error of enterForm.date().errors(); track error) {
-                        <li>{{ error.message }}</li>
-                        }
-                    </ul>
-                </div>
-                }
-            </div>
+        @if (enterForm.date().touched() && enterForm.date().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.date().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">nom</label>
-                <input class="form-control" type="text" [field]="enterForm.name">
+      <div class="form-group">
+        <label class="form-label required-label">nom</label>
+        <input [formField]="enterForm.name" class="form-control" type="text">
 
-                @if (enterForm.name().touched() && enterForm.name().invalid()) {
-                <div class="alert alert-danger">
-                    <ul>
-                        @for (error of enterForm.name().errors(); track error) {
-                        <li>{{ error.message }}</li>
-                        }
-                    </ul>
-                </div>
-                }
-            </div>
+        @if (enterForm.name().touched() && enterForm.name().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.name().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">valeur total</label>
-                <input class="form-control" type="number" [field]="enterForm.totalValue">
+      <div class="form-group">
+        <label class="form-label required-label">valeur total</label>
+        <input [formField]="enterForm.totalValue" class="form-control" type="number">
 
-                @if (enterForm.totalValue().touched() && enterForm.totalValue().invalid()) {
-                <div class="alert alert-danger">
-                    <ul>
-                        @for (error of enterForm.totalValue().errors(); track error) {
-                        <li>{{ error.message }}</li>
-                        }
-                    </ul>
-                </div>
-                }
-            </div>
+        @if (enterForm.totalValue().touched() && enterForm.totalValue().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.totalValue().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">type d'operation</label>
-                <select class="form-control" type="number" [field]="enterForm.operationType">
-                    @for (operationType of OperationType | keyvalue; track $index) {
-                    <option [value]="operationType.value">{{ operationType.key }}</option>
-                    }
-                </select>
-            </div>
+      <div class="form-group">
+        <label class="form-label required-label">type d'opération</label>
+        <select [formField]="enterForm.operationType" class="form-control" type="number">
+          @for (operationType of OperationType | keyvalue; track $index) {
+            <option [value]="operationType.value">{{ operationType.key }}</option>
+          }
+        </select>
+      </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">Désactivé</label>
-                <input class="form-control" type="checkbox" [field]="enterForm.isDisabled">
-            </div>
+      <div class="form-group">
+        <label class="form-label required-label">Désactivé</label>
+        <input [formField]="enterForm.isDisabled" class="form-control" type="checkbox">
+      </div>
 
-            <!-- Line form -->
-            @for (line of this.lines; track line) {
-                <div class="form-group">
-                <label class="form-label required-label">utilisateur</label>
-                <select class="form-control" [field]="line.user.userName">
-                    @for (user of userService.Users(); track user.id) {
-                        <option value="user.id">{{ user.userName }}</option>
-                    }
-                </select>              
-            </div>
 
-            <div class="form-group">
-                <label class="form-label required-label">Valeur</label>
-                <input class="form-control" type="number" [field]="line.value">
-            </div>
+      <!-- Line form -->
+      @for (line of enterForm.lines; let index = $index; track index) {
+        <div class="form-group">
+          <label class="form-label required-label">utilisateur</label>
+            <select [formField]="line.user.userName" class="form-control">
+            @for (user of userService.Users(); track user.id) {
+              <option value="user.id">{{ user.userName }}</option>
             }
-
+          </select>
         </div>
-    </div>
 
-    <div class="actions">
-        <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
+        <div class="form-group">
+          <label class="form-label required-label">Valeur</label>
+          <input [formField]="line.value" class="form-control" type="number">
+        </div>
+      }
+
+
     </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" type="submit">Ajouter l'utilisateur</button>
+  </div>
 </form>

@@ -1,5 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { UserService } from '../../service/accountService/user.service';
+import {Component, inject, input} from '@angular/core';
+import {User} from '../../models/user';
+import {UserService} from '../../service/accountService/user.service';
 
 @Component({
   selector: 'app-userdetail',
@@ -9,9 +10,10 @@ import { UserService } from '../../service/accountService/user.service';
 })
 export class UserDetailComponent{
 
+  user = input.required<User>();
   private service = inject(UserService);
-  
+
   updateUser(){
-    this.service.updateUserApi();
+    this.service.updateUserApi(this.user());
   }
 }

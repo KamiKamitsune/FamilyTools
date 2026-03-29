@@ -4,6 +4,7 @@ import { UserComponent } from './user/user.component';
 import { AccountEnterComponent } from './easycompta/account-enter/account-enter.component';
 import { AccountPageComponent } from './easycompta/account-page/account-page.component';
 import { AccountTagComponent } from './easycompta/account-tag/account-tag.component';
+import {accountEnterResolver} from './dataResolver/account-enter.resolver';
 
 export const routes: Routes = [
     {
@@ -15,7 +16,10 @@ export const routes: Routes = [
                 component: AccountPageComponent
             }, {
                 path: 'account-enter/:id',
-                component: AccountEnterComponent
+                component: AccountEnterComponent,
+                resolve:{
+                  enter: accountEnterResolver
+                }
             }, {
                 path: 'account-tag',
                 component: AccountTagComponent

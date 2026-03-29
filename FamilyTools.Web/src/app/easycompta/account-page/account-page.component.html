@@ -38,23 +38,23 @@
       <div class="filter-control">
         <label>Personne:</label>
         <!-- <select>
-              <option value="">Toutes</option>
-              @for (user of this.current_page?.getUsers(); track $index) {
-                <option value="{{ user.id }}">{{ user.userName }}</option>
-              }
-            </select> -->
+          <option value="">Toutes</option>
+          @for (user of this.current_page?.getUsers(); track $index) {
+          <option value="{{ user.id }}">{{ user.userName }}</option>
+          }
+        </select> -->
       </div>
       <div class="filter-control">
         <label>Statut:</label>
         <select>
           <option value="">Tous</option>
           <!-- <option value="payé">Payé</option>
-              <option value="en attente">En attente</option> -->
+          <option value="en attente">En attente</option> -->
         </select>
       </div>
     </div>
     <div class="action-buttons">
-      <button class="btn btn-primary" routerLink='/easycompta/account-enter'> + Ajouter une entrée</button>
+      <button class="btn btn-primary" routerLink="/easycompta/account-enter"> + Ajouter une entrée</button>
       <input #addCsvButton type="file" accept=".csv" (change)="onFileSelected($event)">
       <button (click)="uploadFile()" [disabled]="!selectedFile">
         Envoyer CSV
@@ -63,52 +63,61 @@
   </div>
   <table>
     <thead>
-      <tr>
-        <th>Type d'operation<span class="sort-icon">↕</span></th>
-        <th>Description <span class="sort-icon">↕</span></th>
-        <th>Catégorie</th>
-        <th>Montant <span class="sort-icon">↕</span></th>
-        <th>Assigné à</th>
-        <th>activé</th>
-        <th>Date <span class="sort-icon">↕</span></th>
-        <th class="action-column">Actions</th>
-      </tr>
+    <tr>
+      <th>Type d'operation<span class="sort-icon">↕</span></th>
+      <th>Description <span class="sort-icon">↕</span></th>
+      <th>Catégorie</th>
+      <th>Montant <span class="sort-icon">↕</span></th>
+      <th>Assigné à</th>
+      <th>activé</th>
+      <th>Date <span class="sort-icon">↕</span></th>
+      <th class="action-column">Actions</th>
+    </tr>
     </thead>
     <tbody>
       @for (enter of current_page?.enters; track $index) {
-      <tr>
-        <td>{{ operationtype[enter.operationType] }}</td>
-        <td>{{ enter.name }}</td>
-        <td><span class="tag-icon">⚡</span></td>
-        <td class="numeric-value">{{ enter.totalValue }} €</td>
-        <td>
-          <div class="assignee-list">
-            @for (line of enter.lines; let last = $last; track line) {
-            {{ line.user.userName }}@if (!last) { , }
-            }
-          </div>
-        </td>
-        <td>
-          <label class="toggle-switch">
-            @if (enter.isDisabled) {
-              <input type="checkbox" id="{{ enter.id }}" (change)="disabledEnter($event)">
-            }
-            @else {
-              <input type="checkbox" checked id="{{ enter.id }}" (change)="disabledEnter($event)">
-            }
-            <span class="toggle-slider"></span>
-          </label>
-        </td>
-        <td> {{ enter.date }}</td>
-        <td>
-          <div class="row-actions">
-            <a routerLink="/easycompta/account-enter/{{ enter.id }}"><button type="button" ><span class="action-icon">✏️</span></button></a>
-            <button type="button"><span class="action-icon">🗑️</span></button>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        }
+        <tr>
+          <td>{{ operationtype[enter.operationType] }}</td>
+          <td>{{ enter.name }}</td>
+          <td>
+            <span class="tag-icon">⚡</span>
+          </td>
+          <td class="numeric-value">{{ enter.totalValue }} €</td>
+          <td>
+            <div class="assignee-list">
+              @for (line of enter.lines; let last = $last; track line) {
+                {{ line.user.userName }}@if (!last) {
+                  ,
+                }
+              }
+            </div>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              @if (enter.isDisabled) {
+                <input (change)="disabledEnter($event)" id="{{ enter.id }}" type="checkbox">
+              } @else {
+                <input (change)="disabledEnter($event)" checked id="{{ enter.id }}" type="checkbox">
+              }
+              <span class="toggle-slider"></span>
+            </label>
+          </td>
+          <td> {{ enter.date }}</td>
+          <td>
+            <div class="row-actions">
+              <a routerLink="/easycompta/account-enter/{{ enter.id }}">
+                <button type="button">
+                  <span class="action-icon">✏️</span>
+                </button>
+              </a>
+              <button type="button">
+                <span class="action-icon">🗑️</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+      }
     </tbody>
   </table>
 </div>

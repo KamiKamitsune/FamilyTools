@@ -5,58 +5,66 @@
   <title>Ajouter un Utilisateur</title>
 </head>
 <body>
-  <div class="app-container">
-    <div class="header">
-      <h1>Tableau de Bord des Utilisateurs</h1>
-    </div>
-    
-    <div class="card">
+<div class="app-container">
+  <div class="header">
+    <h1>Tableau de Bord des Utilisateurs</h1>
+  </div>
+
+  <div class="card">
     <table>
-        <thead>
+      <thead>
+      <tr>
+        <th>Id</th>
+        <th>Prénom</th>
+        <th>nom de famille</th>
+        <th>Nom d'utilisateur</th>
+        <th>Date de création</th>
+        <th class="action-column">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (user of service.Users(); let i = $index; track user) {
           <tr>
-            <th>Id</th>
-            <th>Prénom</th>
-            <th>nom de famille</th>
-            <th>Nom d'utilisateur</th>
-            <th>Date de création</th>
-            <th class="action-column">Actions</th>
+            <td>{{ user.id }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>{{ user.userName }}</td>
+            <td>{{ user.creationDate | date:'shortDate' }}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button">
+                  <span class="action-icon">✏️</span>
+                </button>
+                <button (click)="DeleteUser(user.id!)" type="button">
+                  <span class="action-icon">🗑️</span>
+                </button>
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (user of service.Users(); let i = $index; track user) {
-            <tr>
-              <td>{{ user.id }}</td>
-              <td>{{ user.firstName }}</td>
-              <td>{{ user.lastName }}</td>
-              <td>{{ user.userName }}</td>
-              <td>{{ user.creationDate | date:'shortDate'}}</td>
-              <td>
-                <div class="row-actions">
-                  <button type="button"><span class="action-icon">✏️</span></button>
-                  <button type="button" (click)="DeleteUser(user.id!)"><span class="action-icon">🗑️</span></button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-          }
-        </tbody>
-      </table>
+          <tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ajout utilisateur -->
+  <div class="breadcrumb">
+    <span class="breadcrumb-item">
+      <a class="breadcrumb-link" href="#">Accueil</a>
+    </span>
+    <span class="breadcrumb-item">
+      <a class="breadcrumb-link" href="#">Utilisateurs</a>
+    </span>
+    <span class="breadcrumb-item">Ajouter un utilisateur</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Ajouter un nouvel utilisateur</h2>
     </div>
 
-    <!-- Ajout utilisateur -->
-    <div class="breadcrumb">
-      <span class="breadcrumb-item"><a href="#" class="breadcrumb-link">Accueil</a></span>
-      <span class="breadcrumb-item"><a href="#" class="breadcrumb-link">Utilisateurs</a></span>
-      <span class="breadcrumb-item">Ajouter un utilisateur</span>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">Ajouter un nouvel utilisateur</h2>
-      </div>
-      
-      <app-user-form/>
-    </div>
+    <app-user-form/>
   </div>
+</div>
 </body>
 </html>

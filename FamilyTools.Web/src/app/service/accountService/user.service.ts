@@ -1,9 +1,8 @@
-import { inject, Injectable, OnInit, signal } from '@angular/core';
-import { User } from '../../models/user';
-import { HttpClient } from '@angular/common/http';
-import { HttpHelperService } from '../httpHelper/http-helper.service';
-import { AppSetings } from '../../constants/app.constants';
-import { finalize, Observable, Subscriber } from 'rxjs';
+import {inject, Injectable, signal} from '@angular/core';
+import {User} from '../../models/user';
+import {HttpHelperService} from '../httpHelper/http-helper.service';
+import {AppSetings} from '../../constants/app.constants';
+import {finalize, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +36,10 @@ export class UserService{
     );
   }
 
-  public async getUser(id: number){
+  public getUser(id: number) {
     return this.helperService.get<User>(`${AppSetings.USER_URL}index`, id).pipe(
       finalize(() => this.getUserListApi())
-    );
+    )
   }
 
   public async updateUserApi(user: User) {
