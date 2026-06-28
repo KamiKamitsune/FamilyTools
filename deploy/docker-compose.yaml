@@ -1,0 +1,266 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Compose de PRODUCTION (VM family-tools / Debian + Docker).
+#
+# Dérivé du docker-compose généré par `aspire publish`, mais adapté à un déploiement
+# SANS registre et SANS build sur la VM :
+#   - Services .NET (migrations/easycomptaapi/accounts/csv-worker) : images chargées
+#     depuis des tarballs OCI produits en CI par `dotnet publish -t:PublishContainer`
+#     (cf. job `deploy` du .gitlab-ci.yml), puis `docker load`. Tags fixes ci-dessous.
+#   - Front Angular : servi par un nginx standard depuis le dist bind-monté (./web),
+#     avec routage /api, /hubs, /identity vers les APIs (cf. ./nginx.conf). Aucune
+#     image à construire.
+#
+# Secrets (mots de passe, secret service-account) : fournis par le fichier .env
+# (variable CI `DEPLOY_ENV_FILE`, type File). Valeurs STABLES — ne pas regénérer,
+# sous peine de rompre avec les volumes persistants existants.
+# ─────────────────────────────────────────────────────────────────────────────
+services:
+  # Tableau de bord OpenTelemetry (collecte traces/logs/metrics des services).
+  familytools-compose-dashboard:
+    image: "mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest"
+    ports:
+      - "18888:18888"
+    expose:
+      - "18889"
+      - "18890"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  cache:
+    image: "docker.io/library/redis:8.6"
+    command:
+      - "-c"
+      - "redis-server --requirepass $$REDIS_PASSWORD"
+    entrypoint:
+      - "/bin/sh"
+    environment:
+      REDIS_PASSWORD: "${CACHE_PASSWORD}"
+    expose:
+      - "6379"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  keycloak:
+    image: "quay.io/keycloak/keycloak:26.6"
+    command:
+      - "start"
+      - "--import-realm"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "${KEYCLOAK_PASSWORD}"
+      KC_HEALTH_ENABLED: "true"
+      KC_FEATURES: "opentelemetry"
+      # HTTP simple (terminaison TLS déléguée au reverse-proxy frontal) + host explicite.
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_PROXY_HEADERS: "xforwarded"
+      FAMILYTOOLS_ACCOUNT_SVC_SECRET: "${ACCOUNT_SVC_SECRET}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://familytools-compose-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "keycloak"
+    # Publié : le SPA (navigateur) doit joindre Keycloak pour l'authentification OIDC.
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: "volume"
+        target: "/opt/keycloak/data"
+        source: "familytools-keycloak-data"
+        read_only: false
+      - type: "bind"
+        target: "/opt/keycloak/themes/familytools"
+        source: "./keycloak/themes/familytools"
+        read_only: false
+      - type: "bind"
+        target: "/opt/keycloak/data/import"
+        source: "./keycloak/realms"
+        read_only: true
+    networks:
+      - "aspire"
+    restart: "always"
+
+  messaging:
+    image: "docker.io/library/rabbitmq:4.3-management"
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "${MESSAGING_PASSWORD}"
+    expose:
+      - "5672"
+      - "15672"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  familytools:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${FAMILYTOOLS_PASSWORD}"
+    expose:
+      - "1433"
+    volumes:
+      - type: "volume"
+        target: "/var/opt/mssql"
+        source: "familytools-sql-data"
+        read_only: false
+    networks:
+      - "aspire"
+    restart: "always"
+
+  migrations:
+    image: "familytools/migrations:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ConnectionStrings__easycompta: "Server=FamilyTools,1433;User ID=sa;Password=${FAMILYTOOLS_PASSWORD};TrustServerCertificate=true;Initial Catalog=easycompta"
+      EASYCOMPTA_HOST: "FamilyTools"
+      EASYCOMPTA_PORT: "1433"
+      EASYCOMPTA_USERNAME: "sa"
+      EASYCOMPTA_PASSWORD: "${FAMILYTOOLS_PASSWORD}"
+      EASYCOMPTA_URI: "mssql://sa:${FAMILYTOOLS_PASSWORD}@FamilyTools:1433/easycompta"
+      EASYCOMPTA_JDBCCONNECTIONSTRING: "jdbc:sqlserver://FamilyTools:1433;databaseName=easycompta;trustServerCertificate=true"
+      EASYCOMPTA_DATABASENAME: "easycompta"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://familytools-compose-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "migrations"
+    depends_on:
+      familytools:
+        condition: "service_started"
+    networks:
+      - "aspire"
+    restart: "on-failure"
+
+  easycomptaapi:
+    image: "familytools/easycomptaapi:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      ConnectionStrings__easycompta: "Server=FamilyTools,1433;User ID=sa;Password=${FAMILYTOOLS_PASSWORD};TrustServerCertificate=true;Initial Catalog=easycompta"
+      EASYCOMPTA_HOST: "FamilyTools"
+      EASYCOMPTA_PORT: "1433"
+      EASYCOMPTA_USERNAME: "sa"
+      EASYCOMPTA_PASSWORD: "${FAMILYTOOLS_PASSWORD}"
+      EASYCOMPTA_URI: "mssql://sa:${FAMILYTOOLS_PASSWORD}@FamilyTools:1433/easycompta"
+      EASYCOMPTA_JDBCCONNECTIONSTRING: "jdbc:sqlserver://FamilyTools:1433;databaseName=easycompta;trustServerCertificate=true"
+      EASYCOMPTA_DATABASENAME: "easycompta"
+      ConnectionStrings__cache: "cache:6379,password=${CACHE_PASSWORD}"
+      CACHE_HOST: "cache"
+      CACHE_PORT: "6379"
+      CACHE_PASSWORD: "${CACHE_PASSWORD}"
+      CACHE_URI: "redis://:${CACHE_PASSWORD}@cache:6379"
+      ConnectionStrings__messaging: "amqp://guest:${MESSAGING_PASSWORD}@messaging:5672"
+      MESSAGING_HOST: "messaging"
+      MESSAGING_PORT: "5672"
+      MESSAGING_USERNAME: "guest"
+      MESSAGING_PASSWORD: "${MESSAGING_PASSWORD}"
+      MESSAGING_URI: "amqp://guest:${MESSAGING_PASSWORD}@messaging:5672"
+      KEYCLOAK_HTTP: "http://keycloak:8080"
+      services__keycloak__http__0: "http://keycloak:8080"
+      # Issuer interne + issuer public (URL navigateur). Cf. AuthenticationExtensions.
+      Keycloak__ValidIssuers: "http://keycloak:8080/realms/familytools,${KEYCLOAK_PUBLIC_URL}/realms/familytools"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://familytools-compose-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "EasyComptaAPI"
+    expose:
+      - "8080"
+    depends_on:
+      cache:
+        condition: "service_started"
+      messaging:
+        condition: "service_started"
+      migrations:
+        condition: "service_completed_successfully"
+      keycloak:
+        condition: "service_started"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  accounts:
+    image: "familytools/accounts:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      KEYCLOAK_HTTP: "http://keycloak:8080"
+      services__keycloak__http__0: "http://keycloak:8080"
+      # Issuer interne + issuer public (URL navigateur). Cf. AuthenticationExtensions.
+      Keycloak__ValidIssuers: "http://keycloak:8080/realms/familytools,${KEYCLOAK_PUBLIC_URL}/realms/familytools"
+      Keycloak__ServiceClientSecret: "${ACCOUNT_SVC_SECRET}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://familytools-compose-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "accounts"
+    expose:
+      - "8080"
+    depends_on:
+      keycloak:
+        condition: "service_started"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  csv-worker:
+    image: "familytools/csv-worker:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ConnectionStrings__easycompta: "Server=FamilyTools,1433;User ID=sa;Password=${FAMILYTOOLS_PASSWORD};TrustServerCertificate=true;Initial Catalog=easycompta"
+      EASYCOMPTA_HOST: "FamilyTools"
+      EASYCOMPTA_PORT: "1433"
+      EASYCOMPTA_USERNAME: "sa"
+      EASYCOMPTA_PASSWORD: "${FAMILYTOOLS_PASSWORD}"
+      EASYCOMPTA_URI: "mssql://sa:${FAMILYTOOLS_PASSWORD}@FamilyTools:1433/easycompta"
+      EASYCOMPTA_JDBCCONNECTIONSTRING: "jdbc:sqlserver://FamilyTools:1433;databaseName=easycompta;trustServerCertificate=true"
+      EASYCOMPTA_DATABASENAME: "easycompta"
+      ConnectionStrings__messaging: "amqp://guest:${MESSAGING_PASSWORD}@messaging:5672"
+      MESSAGING_HOST: "messaging"
+      MESSAGING_PORT: "5672"
+      MESSAGING_USERNAME: "guest"
+      MESSAGING_PASSWORD: "${MESSAGING_PASSWORD}"
+      MESSAGING_URI: "amqp://guest:${MESSAGING_PASSWORD}@messaging:5672"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://familytools-compose-dashboard:18889"
+      OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+      OTEL_SERVICE_NAME: "csv-worker"
+    depends_on:
+      messaging:
+        condition: "service_started"
+      migrations:
+        condition: "service_completed_successfully"
+    networks:
+      - "aspire"
+    restart: "always"
+
+  # Front Angular : nginx standard servant le dist bind-monté + reverse-proxy interne
+  # vers les APIs (cf. ./nginx.conf). Aucune image custom à construire.
+  webfrontend:
+    image: "docker.io/library/nginx:1.27-alpine"
+    volumes:
+      - type: "bind"
+        target: "/usr/share/nginx/html"
+        source: "./web"
+        read_only: true
+      - type: "bind"
+        target: "/etc/nginx/conf.d/default.conf"
+        source: "./nginx.conf"
+        read_only: true
+    ports:
+      - "4200:4200"
+    depends_on:
+      easycomptaapi:
+        condition: "service_started"
+      accounts:
+        condition: "service_started"
+      keycloak:
+        condition: "service_started"
+    networks:
+      - "aspire"
+    restart: "always"
+
+networks:
+  aspire:
+    driver: "bridge"
+volumes:
+  familytools-keycloak-data:
+    driver: "local"
+  familytools-sql-data:
+    driver: "local"
