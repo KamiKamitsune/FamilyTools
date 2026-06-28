@@ -14,6 +14,7 @@ public class EasyComptaContext(DbContextOptions<EasyComptaContext> options) : Db
     public DbSet<AccountTag> AccountTags => this.Set<AccountTag>();
     public DbSet<Template> Templates => this.Set<Template>();
     public DbSet<PaymentDone> PaymentDones => this.Set<PaymentDone>();
+    public DbSet<OperationType> OperationTypes => this.Set<OperationType>();
 
     public async Task EnsureSeedData()
     {
@@ -42,6 +43,8 @@ public class EasyComptaContext(DbContextOptions<EasyComptaContext> options) : Db
         new TemplateEntityTypeConfiguration().Configure(modelBuilder.Entity<Template>());
 
         new PaymentDoneEntityTypeConfiguration().Configure(modelBuilder.Entity<PaymentDone>());
+
+        new OperationTypeEntityTypeConfiguration().Configure(modelBuilder.Entity<OperationType>());
 
         base.OnModelCreating(modelBuilder);
     }

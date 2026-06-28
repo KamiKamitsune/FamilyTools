@@ -8,6 +8,13 @@
 <body>
 <div class="container">
     <header>
+        @if (isAuthenticated()) {
+            <div class="auth-bar">
+                <span class="auth-user">{{ userName() }}</span>
+                <a class="auth-account" routerLink="/account">Mon compte</a>
+                <button class="auth-logout" type="button" (click)="logout()">Déconnexion</button>
+            </div>
+        }
         <h1>Portail d'Applications</h1>
         <p class="subtitle">Sélectionnez une application pour l'ouvrir</p>
     </header>
@@ -32,6 +39,8 @@
 </div>
 </body>
 </html>
+
+<app-notification />
 
 <p>
   <router-outlet/>

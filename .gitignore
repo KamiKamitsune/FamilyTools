@@ -405,3 +405,10 @@ Thumbs.db
 
 # Cache files
 /FamilyTools.Web/.angular/cache
+
+# Angular build output
+/FamilyTools.Web/dist
+/FamilyTools.Web/out-tsc
+
+# Config local generee par la CLI Aspire (pointe vers l'AppHost) — regeneree a la demande
+/aspire.config.json

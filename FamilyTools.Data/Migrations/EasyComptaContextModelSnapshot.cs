@@ -17,7 +17,7 @@ namespace FamilyTools.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -60,7 +60,7 @@ namespace FamilyTools.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OperationType")
+                    b.Property<int>("OperationTypeId")
                         .HasColumnType("int");
 
                     b.Property<int>("PageId")
@@ -76,6 +76,8 @@ namespace FamilyTools.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OperationTypeId");
 
                     b.HasIndex("PageId");
 
@@ -185,6 +187,31 @@ namespace FamilyTools.Data.Migrations
                     b.HasAlternateKey("Name");
 
                     b.ToTable("AccountTags", (string)null);
+                });
+
+            modelBuilder.Entity("FamilyTools.Data.Models.EasyCompta.OperationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getdate()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperationType", (string)null);
                 });
 
             modelBuilder.Entity("FamilyTools.Data.Models.EasyCompta.PaymentDone", b =>
@@ -305,6 +332,12 @@ namespace FamilyTools.Data.Migrations
 
             modelBuilder.Entity("FamilyTools.Data.Models.EasyCompta.AccountEnter", b =>
                 {
+                    b.HasOne("FamilyTools.Data.Models.EasyCompta.OperationType", "OperationType")
+                        .WithMany()
+                        .HasForeignKey("OperationTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("FamilyTools.Data.Models.EasyCompta.AccountPage", "Page")
                         .WithMany("Enters")
                         .HasForeignKey("PageId")
@@ -316,6 +349,8 @@ namespace FamilyTools.Data.Migrations
                         .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("OperationType");
 
                     b.Navigation("Page");
 

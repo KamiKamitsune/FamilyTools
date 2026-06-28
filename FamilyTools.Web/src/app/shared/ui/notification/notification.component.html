@@ -1,0 +1,10 @@
+@if (notifications().length) {
+  <div class="notifications">
+    @for (n of notifications(); track n.id) {
+      <div class="notification" [class.error]="n.type === 'error'">
+        <span class="message">{{ n.message }}</span>
+        <button type="button" class="close" (click)="dismiss(n.id)" aria-label="Fermer">×</button>
+      </div>
+    }
+  </div>
+}

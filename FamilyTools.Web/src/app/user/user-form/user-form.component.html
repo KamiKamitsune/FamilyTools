@@ -1,0 +1,61 @@
+<form (submit)="onSubmit($event)">
+  <div class="form-container">
+
+    <div class="form-section">
+
+      <div class="form-group">
+        <label class="form-label required-label">
+          Prénom
+        </label>
+        <input [formField]="userForm.firstName" class="form-control" type="text">
+
+        @if (userForm.firstName().touched() && userForm.firstName().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of userForm.firstName().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required-label">
+          Nom
+        </label>
+        <input [formField]="userForm.lastName" class="form-control" type="text">
+
+        @if (userForm.lastName().touched() && userForm.lastName().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of userForm.lastName().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required-label">Pseudo</label>
+        <input [formField]="userForm.userName" class="form-control" type="text">
+
+        @if (userForm.userName().touched() && userForm.userName().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of userForm.userName().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" type="submit">Ajouter l'utilisateur</button>
+  </div>
+</form>

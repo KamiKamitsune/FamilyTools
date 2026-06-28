@@ -1,0 +1,45 @@
+<div class="header">
+  <h1>Diagrammes de l'année</h1>
+  <div class="month-selector">
+    <select (change)="changeYear($event)">
+      @for (year of yearList(); track year) {
+        <option [value]="year" [selected]="year === selectedYear()">{{ year }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+<div class="navigation-tabs">
+  <div class="tab" routerLink="/easycompta/account-page">Tableau de données</div>
+  <div class="tab" routerLink="/easycompta/account-tag">Tag</div>
+  <div class="tab" routerLink="/easycompta/account-chart-month">Diagrammes mois</div>
+  <div class="tab active">Diagrammes année</div>
+  <div class="tab" routerLink="/user">Membres</div>
+</div>
+
+@if (yearList().length === 0) {
+  <div class="card empty-state">Aucune donnée à afficher pour le moment.</div>
+} @else {
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <h2>Dépenses par catégorie — {{ selectedYear() }}</h2>
+      <div class="chart-canvas-wrapper">
+        <canvas #tagCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h2>Dépenses par membre — {{ selectedYear() }}</h2>
+      <div class="chart-canvas-wrapper">
+        <canvas #userCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h2>Évolution des dépenses — {{ selectedYear() }}</h2>
+      <div class="chart-canvas-wrapper">
+        <canvas #monthCanvas></canvas>
+      </div>
+    </div>
+  </div>
+}

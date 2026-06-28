@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { EasycomptaComponent } from './easycompta.component';
 
@@ -8,9 +9,9 @@ describe('EasycomptaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [EasycomptaComponent]
-    })
-    .compileComponents();
+      imports: [EasycomptaComponent],
+      providers: [provideRouter([])],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(EasycomptaComponent);
     component = fixture.componentInstance;

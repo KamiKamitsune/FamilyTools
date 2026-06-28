@@ -17,7 +17,7 @@ public class AccountPage : BaseModel
         this.IsClosing = false;
     }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public ICollection<AccountEnter> Enters { get; set; } = new List<AccountEnter>();
 

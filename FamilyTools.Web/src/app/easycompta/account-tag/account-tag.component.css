@@ -233,3 +233,28 @@ td {
 tr:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
+
+.tag-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.row-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}

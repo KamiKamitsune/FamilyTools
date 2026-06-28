@@ -104,13 +104,15 @@ public static class Extensions
         if (app.Environment.IsDevelopment())
         {
             // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks("/health");
+            // AllowAnonymous : indispensable si une fallback policy exige l'authentification (sinon les
+            // sondes de sante Aspire echouent).
+            app.MapHealthChecks("/health").AllowAnonymous();
 
             // Only health checks tagged with the "live" tag must pass for app to be considered alive
             app.MapHealthChecks("/alive", new HealthCheckOptions
             {
                 Predicate = r => r.Tags.Contains("live")
-            });
+            }).AllowAnonymous();
         }
 
         return app;

@@ -1,4 +1,5 @@
 ﻿using FamilyTools.Data.Models.EasyCompta;
+using FamilyTools.EasyCompta.Dtos;
 using FamilyTools.EasyCompta.IBusiness;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,95 +17,59 @@ public class AccountEnterController(IAccountEnterBusiness business, ILogger<Acco
     [HttpGet]
     public async Task<IActionResult> Index(int id)
     {
-        try
-        {
-            return this.Ok(await this._business.Find(id));
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this._business.Find(id));
     }
 
     [Route("")]
     [HttpPost]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([FromBody] AccountEnter accountEnter)
+    public async Task<IActionResult> Create([FromBody] AccountEnterDto dto)
     {
-        try
-        {
-            return this.Ok(await this._business.Create(accountEnter));
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this._business.Create(dto.ToEntity()));
     }
 
     [Route("")]
-    [HttpPost]
     [HttpPut]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit([FromBody] AccountEnter accountEnter)
+    public async Task<IActionResult> Edit([FromBody] AccountEnterDto dto)
     {
-        try
-        {
-            return this.Ok(await this._business.Update(accountEnter));
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this._business.Update(dto.ToEntity()));
     }
 
     [Route("{id}")]
-    [HttpGet]
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            return this.Ok(await this._business.Delete(id));
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this._business.Delete(id));
     }
 
     [Route("{month}/{year}")]
     [HttpGet]
     public async Task<IActionResult> ExpensesByTagForAMonth(int month, int year)
     {
-        try
-        {
-            return this.Ok(await this._business.ExpensesByTagForAMonth(month, year));
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this._business.ExpensesByTagForAMonth(month, year));
+    }
+
+    [Route("{year}")]
+    [HttpGet]
+    public async Task<IActionResult> ExpensesByTagForAYear(int year)
+    {
+        return this.Ok(await this._business.ExpensesByTagForAYear(year));
+    }
+
+    [Route("{year}")]
+    [HttpGet]
+    public async Task<IActionResult> ExpensesByMonthForAYear(int year)
+    {
+        return this.Ok(await this._business.ExpensesByMonthForAYear(year));
     }
 
     [Route("{id}")]
     [HttpPatch]
-    public async Task<IActionResult> Desabled(int id, [FromBody] bool desabled)
+    public async Task<IActionResult> Disabled(int id, [FromBody] bool disabled)
     {
-        try
-        {
-            var result = await this._business.DesabledEnter(id, desabled);
-            if (result == null) return this.NotFound();
-            return this.Ok(result);
-        }
-        catch (Exception ex)
-        {
-            this._logger.LogError(ex.Message);
-            return this.BadRequest(ex);
-        }
+        var result = await this._business.DisabledEnter(id, disabled);
+        if (result == null) return this.NotFound();
+        return this.Ok(result);
     }
 }

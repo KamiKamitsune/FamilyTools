@@ -1,65 +1,57 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Ajouter un Tag</title>
-</head>
-<body>
-<div class="app-container">
-  <div class="header">
-    <h1>Tableau de Bord des Tags</h1>
-  </div>
+<div class="header">
+  <h1>Tableau de bord des tags</h1>
+</div>
 
-  <div class="card">
-    <table>
-      <thead>
+<div class="navigation-tabs">
+  <div class="tab" routerLink="/easycompta/account-page">Tableau de données</div>
+  <div class="tab active">Tag</div>
+  <div class="tab" routerLink="/easycompta/account-chart-month">Diagrammes mois</div>
+  <div class="tab" routerLink="/easycompta/account-chart-year">Diagrammes année</div>
+  <div class="tab" routerLink="/user">Membres</div>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
       <tr>
-        <th>Id</th>
         <th>Nom</th>
-        <th>color</th>
+        <th>Couleur</th>
         <th class="action-column">Actions</th>
       </tr>
-      </thead>
-      <tbody>
-        @for (tag of this.service.allTag(); track tag) {
-          <tr>
-            <td>{{ tag.id }}</td>
-            <td>{{ tag.name }}</td>
-            <td>{{ tag.color }}</td>
-            <td>
-              <div class="row-actions">
-                <button type="button">
-                  <span class="action-icon">✏️</span>
-                </button>
-                <button (click)="deleteTag(tag.id!)" type="button">
-                  <span class="action-icon">🗑️</span>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Ajout utilisateur -->
-  <div class="breadcrumb">
-    <span class="breadcrumb-item">
-      <a class="breadcrumb-link" href="#">Accueil</a>
-    </span>
-    <span class="breadcrumb-item">
-      <a class="breadcrumb-link" href="#">Utilisateurs</a>
-    </span>
-    <span class="breadcrumb-item">Ajouter un tag</span>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      <h2 class="card-title">Ajouter un nouvel utilisateur</h2>
-    </div>
-    <app-tag-form/>
-  </div>
+    </thead>
+    <tbody>
+      @for (tag of service.allTag(); track tag.id) {
+        <tr>
+          <td>{{ tag.name }}</td>
+          <td>
+            <span class="tag-swatch" [style.background-color]="tag.color"></span>
+            {{ tag.color }}
+          </td>
+          <td>
+            <div class="row-actions">
+              <button type="button" (click)="editTag(tag)">
+                <span class="action-icon">✏️</span>
+              </button>
+              <button type="button" (click)="deleteTag(tag.id!)">
+                <span class="action-icon">🗑️</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </div>
-</body>
-</html>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
+      @if (editingTag()) {
+        Modifier le tag
+      } @else {
+        Ajouter un nouveau tag
+      }
+    </h2>
+  </div>
+  <app-tag-form [tagToEdit]="editingTag()" (saved)="onSaved()" />
+</div>

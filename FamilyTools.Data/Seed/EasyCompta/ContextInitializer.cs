@@ -9,7 +9,8 @@ public class ContextInitializer
         List<IContextSeed> listSeed =
         [
             new AccountTagSeed(context),
-            new UserSeed(context)
+            new UserSeed(context),
+            new OperationTypeSeed(context)
         ];
 
         foreach (var contextSeed in listSeed) await contextSeed.Execute();

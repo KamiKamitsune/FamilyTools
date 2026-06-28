@@ -17,78 +17,42 @@ public class AccountLinesController(IAccountLineBusiness business, ILogger<Accou
     //[ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([FromBody] AccountLine accountLine)
     {
-        try
-        {
-            return this.Ok(await this.business.Create(accountLine));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Create(accountLine));
     }
 
     [Route("[action]")]
-    [HttpPost]
     [HttpPut]
     //[ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromBody] AccountLine accountLine)
     {
-        try
-        {
-            return this.Ok(await this.business.Update(accountLine));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Update(accountLine));
     }
 
     [Route("[action]/{id}")]
     [HttpGet]
     public async Task<IActionResult> Get(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Find(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Find(id));
     }
 
-
     [Route("[action]/{id}")]
-    [HttpGet]
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Delete(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Delete(id));
     }
 
     [Route("[action]/{year}")]
     [HttpGet]
     public async Task<IActionResult> ExpensesByUserForAYear(int year)
     {
-        try
-        {
-            return this.Ok(await this.business.ExpensesByUserForAYear(year));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.ExpensesByUserForAYear(year));
+    }
+
+    [Route("[action]/{month}/{year}")]
+    [HttpGet]
+    public async Task<IActionResult> ExpensesByUserAndTagForAMonth(int month, int year)
+    {
+        return this.Ok(await this.business.ExpensesByUserAndTagForAMonth(month, year));
     }
 }

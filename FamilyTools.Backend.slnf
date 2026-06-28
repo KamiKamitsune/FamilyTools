@@ -1,0 +1,16 @@
+{
+  "solution": {
+    "path": "FamilyTools.sln",
+    "projects": [
+      "FamilyTools.AppHost\\FamilyTools.AppHost.csproj",
+      "FamilyTools.ServiceDefaults\\FamilyTools.ServiceDefaults.csproj",
+      "FamilyTools.EasyCompta\\FamilyTools.EasyCompta.csproj",
+      "FamilyTools.Data\\FamilyTools.Data.csproj",
+      "FamilyTools.MigrationService\\FamilyTools.MigrationService.csproj",
+      "FamilyTools.EasyCompta.Tests\\FamilyTools.EasyCompta.Tests.csproj",
+      "FamilyTools.EasyCompta.Business\\FamilyTools.EasyCompta.Business.csproj",
+      "FamilyTools.CsvWorker\\FamilyTools.CsvWorker.csproj",
+      "FamilyTools.Accounts\\FamilyTools.Accounts.csproj"
+    ]
+  }
+}

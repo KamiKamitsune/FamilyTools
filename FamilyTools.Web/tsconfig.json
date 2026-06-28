@@ -5,10 +5,12 @@
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
     "strict": true,
+    "baseUrl": ".",
     "paths": {
-      "form": [
-        "./dist/form"
-      ]
+      "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@easycompta/*": ["src/app/easycompta/*"],
+      "@user/*": ["src/app/user/*"]
     },
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -29,13 +31,5 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
-  "references": [
-    {
-      "path": "./projects/form/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/form/tsconfig.spec.json"
-    }
-  ]
+  }
 }

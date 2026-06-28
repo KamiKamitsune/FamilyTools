@@ -1,131 +1,208 @@
-import { Component, ElementRef, inject, input, OnInit, ViewChild } from '@angular/core';
-import { AccountPage } from '../../models/account-page';
-import { HttpClient } from '@angular/common/http';
-import { Router, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { AccountTag } from '../../models/account-tag';
-import { PaymentDone } from '../../models/payment-done';
-import { AccountEnter } from '../../models/account-enter';
-import {AppSetings} from '../../constants/app.constants';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { AccountPage } from '@easycompta/models/account-page';
+import { AccountEnter } from '@easycompta/models/account-enter';
+import { AccountPageService } from '@easycompta/data/account-page.service';
+import { AccountEnterService } from '@easycompta/data/account-enter.service';
+import { AccountTagService } from '@easycompta/data/account-tag.service';
+import { ImportEventsService } from '@easycompta/data/import-events.service';
+import { UserService } from '@user/data/user.service';
+import { NotificationService } from '@core/notification/notification.service';
 
 @Component({
   selector: 'app-accountpage',
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, DecimalPipe],
   templateUrl: './account-page.component.html',
-  styleUrl: './account-page.component.css'
+  styleUrl: './account-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountPageComponent implements OnInit {
-  current_page: AccountPage | undefined;
-  date_list: Date[] = [];
-  last_date: Date = new Date();
-  current_tags: AccountTag[] = [];
-  selectedFile: File | undefined;
+  private readonly pageService = inject(AccountPageService);
+  private readonly enterService = inject(AccountEnterService);
+  readonly tagService = inject(AccountTagService);
+  readonly userService = inject(UserService);
+  private readonly importEvents = inject(ImportEventsService);
+  private readonly notifications = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly currentPage = signal<AccountPage | undefined>(undefined);
+  readonly dateList = signal<Date[]>([]);
+  readonly lastDate = signal<Date>(new Date());
+  readonly selectedFile = signal<File | undefined>(undefined);
+
+  readonly selectedTagId = signal<number | null>(null);
+  readonly selectedUserId = signal<number | null>(null);
+
+  /** Écritures de la page courante après application des filtres catégorie / personne. */
+  readonly filteredEnters = computed<AccountEnter[]>(() => {
+    const enters = this.currentPage()?.enters ?? [];
+    const tagId = this.selectedTagId();
+    const userId = this.selectedUserId();
+    return enters.filter(
+      enter =>
+        (tagId === null || enter.tag?.id === tagId) &&
+        (userId === null || (enter.lines ?? []).some(line => line.user?.id === userId)),
+    );
+  });
+
   @ViewChild('addCsvButton', { static: false }) addCsvButton!: ElementRef<HTMLInputElement>;
 
-  private readonly _http = inject(HttpClient);
-  private readonly router = inject(Router);
-
   ngOnInit(): void {
-    this.get_all_month();
-  }
+    this.loadMonths();
 
-  public async changePages(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const value = new Date(select.value);
-      this.call_new_page(value.getMonth(), value.getFullYear());
-  }
-
-  private get_all_month() {
-    if (this._http) {
-      // this._http.get<Date[]>('api/easycompta/AccountPage/getallmonth').subscribe({
-      this._http.get<Date[]>(`${AppSetings.PAGE_URL}getallmonth`).subscribe({
-        next: result => {
-          result.forEach(e => {
-            this.date_list.push(new Date(e));
-          });
-          this.date_list.sort((a, b) => b.getTime() - a.getTime());
-          this.last_date = this.date_list.reduce((a, b) => a > b ? a : b);
-          this.call_new_page(this.last_date.getMonth(), this.last_date.getFullYear());
-        },
-        error: console.error
+    // Rafraîchissement temps réel : quand le worker a fini de traiter un import, on recharge.
+    this.importEvents.connect();
+    this.importEvents.importCompleted$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.notifications.showInfo('Import terminé : données mises à jour.');
+        this.loadMonths();
       });
-    }
   }
 
-  private call_new_page(month: number, year: number) {
-    if (this._http) {
-      month = month + 1;
-        this._http.get<AccountPage>(`api/easycompta/AccountPage/Get/${month}/${year}`).subscribe({
-          next: result => {
-            result.date = new Date(result.date);
-            this.current_page = result;
-          },
-          error: console.error
-        });
-    }
+  public onTagFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedTagId.set(value ? Number(value) : null);
   }
 
-  addAccountEnter() {
-    this.router.navigate(["/accountenter"]);
+  public onUserFilterChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.selectedUserId.set(value ? Number(value) : null);
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.selectedFile = file;
-    }
-  }
-
-  uploadFile() {
-    if (this.selectedFile) {
-      const formData = new FormData();
-
-      formData.append('csvFile', this.selectedFile, this.selectedFile.name);
-
-      this._http.post("api/easycompta/ImportCSV", formData).subscribe({
-        next: () => {
-          this.addCsvButton.nativeElement.value = "";
-          window.location.reload();
-        },
-        error: (error) => {
-          console.error('Erreur lors de l\'envoi', error);
+  public deleteEnter(id: number): void {
+    this.enterService.delete(id).subscribe({
+      next: () => {
+        const page = this.currentPage();
+        if (!page) return;
+        this.currentPage.set({ ...page, enters: page.enters.filter(enter => enter.id !== id) });
+        if (page.id != null) {
+          this.refreshPaymentDones(page.id);
         }
-      });
-    }
+      },
+      error: error => console.error(error),
+    });
   }
 
-  clickPaymentDone(event: any){
-    if (this._http) {
-      this._http.patch<PaymentDone>(`api/easycompta/PaymentDone/Patch/${event.target.id}`, event.target.checked).subscribe({
-        next: (response) => {
-          this.current_page?.paymentDones.map(x => x.id == response.id? x = response : null);
-        },
-        error: (error => {
-          console.log(error);
-          event.target.checked = !event.target.checked;
-        })
-      })
-    }
+  public changePages(event: Event): void {
+    const value = new Date((event.target as HTMLSelectElement).value);
+    this.loadPage(value.getMonth(), value.getFullYear());
   }
 
-  disabledEnter(event: any){
-    if (this._http) {
-      this._http.patch<AccountEnter>(`api/easycompta/AccountEnter/Desabled/${event.target.id}`, !event.target.checked).subscribe({
-        next: (response) => {
-          this.current_page?.enters.map(x => x.id == response.id? x.isDisabled = response.isDisabled : null)
-          this._http.get<PaymentDone[]>(`api/easycompta/PaymentDone/getByPageId/${this.current_page?.id}`).subscribe({
-            next:(response) => {
-              if (this.current_page) {
-                this.current_page.paymentDones = response;
-              }
-            }
-          })
-        },
-        error: (error => {
-          event.target.checked = !event.target.checked;
-        })
-      })
-    }
+  public onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile.set(input.files?.[0]);
   }
 
+  public uploadFile(): void {
+    const file = this.selectedFile();
+    if (!file) return;
+
+    this.pageService.importCsv(file).subscribe({
+      next: () => {
+        this.addCsvButton.nativeElement.value = '';
+        this.selectedFile.set(undefined);
+        // Le traitement est asynchrone (worker) : le tableau se rafraîchira via SignalR.
+        this.notifications.showInfo('Import en cours… le tableau se rafraîchira automatiquement.');
+      },
+      error: error => console.error("Erreur lors de l'envoi", error),
+    });
+  }
+
+  public clickPaymentDone(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const id = Number(input.id);
+    const checked = input.checked;
+
+    this.pageService.setPaymentDone(id, checked).subscribe({
+      next: response => {
+        const page = this.currentPage();
+        if (!page) return;
+        this.currentPage.set({
+          ...page,
+          paymentDones: page.paymentDones.map(p => (p.id === response.id ? response : p)),
+        });
+      },
+      error: error => {
+        console.log(error);
+        input.checked = !input.checked;
+      },
+    });
+  }
+
+  public disabledEnter(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const id = Number(input.id);
+    const disabled = !input.checked;
+
+    this.pageService.setEnterDisabled(id, disabled).subscribe({
+      next: response => {
+        const page = this.currentPage();
+        if (!page) return;
+        this.currentPage.set({
+          ...page,
+          enters: page.enters.map(e =>
+            e.id === response.id ? { ...e, isDisabled: response.isDisabled } : e,
+          ),
+        });
+        if (page.id != null) {
+          this.refreshPaymentDones(page.id);
+        }
+      },
+      error: () => {
+        input.checked = !input.checked;
+      },
+    });
+  }
+
+  private refreshPaymentDones(pageId: number): void {
+    this.pageService.getPaymentDonesByPage(pageId).subscribe({
+      next: paymentDones => {
+        const page = this.currentPage();
+        if (page) {
+          this.currentPage.set({ ...page, paymentDones });
+        }
+      },
+    });
+  }
+
+  private loadMonths(): void {
+    this.pageService.getAllMonths().subscribe({
+      next: result => {
+        const dates = result
+          .map(e => new Date(e))
+          .sort((a, b) => b.getTime() - a.getTime());
+        this.dateList.set(dates);
+
+        if (dates.length > 0) {
+          const last = dates.reduce((a, b) => (a > b ? a : b));
+          this.lastDate.set(last);
+          this.loadPage(last.getMonth(), last.getFullYear());
+        }
+      },
+      error: console.error,
+    });
+  }
+
+  private loadPage(monthZeroBased: number, year: number): void {
+    this.pageService.getPage(monthZeroBased + 1, year).subscribe({
+      next: result => {
+        result.date = new Date(result.date);
+        this.currentPage.set(result);
+      },
+      error: console.error,
+    });
+  }
 }

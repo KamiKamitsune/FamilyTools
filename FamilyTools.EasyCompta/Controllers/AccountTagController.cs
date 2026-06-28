@@ -1,4 +1,4 @@
-﻿using FamilyTools.Data.Models.EasyCompta;
+﻿using FamilyTools.EasyCompta.Dtos;
 using FamilyTools.EasyCompta.IBusiness;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,80 +17,38 @@ public class AccountTagController(IAccountTagBusiness business, ILogger<AccountT
     [HttpGet]
     public async Task<ActionResult> List()
     {
-        try
-        {
-            var tags = await this.business.TagList();
+        var tags = await this.business.TagList();
 
-            return this.Ok(tags);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(tags);
     }
 
     [Route("[action]/{id}")]
     [HttpGet]
     public async Task<IActionResult> Index(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Find(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Find(id));
     }
 
     [Route("[action]")]
     [HttpPost]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([FromBody] AccountTag accounTag)
+    public async Task<IActionResult> Create([FromBody] AccountTagDto dto)
     {
-        try
-        {
-            return this.Ok(await this.business.Create(accounTag));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Create(dto.ToEntity()));
     }
 
     [Route("[action]")]
-    [HttpPost]
     [HttpPut]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit([FromBody] AccountTag accounTag)
+    public async Task<IActionResult> Edit([FromBody] AccountTagDto dto)
     {
-        try
-        {
-            return this.Ok(await this.business.Update(accounTag));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Update(dto.ToEntity()));
     }
 
     [Route("[action]/{id}")]
-    [HttpGet]
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Delete(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Delete(id));
     }
 }

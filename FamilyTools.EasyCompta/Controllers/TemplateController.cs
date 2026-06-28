@@ -1,4 +1,4 @@
-﻿using FamilyTools.Data.Models.EasyCompta;
+﻿using FamilyTools.EasyCompta.Dtos;
 using FamilyTools.EasyCompta.IBusiness;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,63 +15,29 @@ public class TemplateController(ITemplateBusiness business, ILogger<TemplateCont
     [HttpGet]
     public async Task<IActionResult> Index(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Find(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Find(id));
     }
 
     [Route("[action]")]
     [HttpPost]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([FromBody] Template template)
+    public async Task<IActionResult> Create([FromBody] TemplateDto dto)
     {
-        try
-        {
-            return this.Ok(await this.business.Create(template));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Create(dto.ToEntity()));
     }
 
     [Route("[action]")]
-    [HttpPost]
     [HttpPut]
     //[ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit([FromBody] Template template)
+    public async Task<IActionResult> Edit([FromBody] TemplateDto dto)
     {
-        try
-        {
-            return this.Ok(await this.business.Update(template));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Update(dto.ToEntity()));
     }
 
     [Route("[action]/{id}")]
-    [HttpGet]
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        try
-        {
-            return this.Ok(await this.business.Delete(id));
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest();
-        }
+        return this.Ok(await this.business.Delete(id));
     }
 }

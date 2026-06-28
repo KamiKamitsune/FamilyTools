@@ -6,5 +6,5 @@ namespace FamilyTools.Data.Models.EasyCompta;
 public class AccountTag : BaseModel
 {
     public string Name { get; set; } = "default";
-    public string Color { get; set; } = "#FFFFF";
+    public string Color { get; set; } = "#FFFFFF";
 }

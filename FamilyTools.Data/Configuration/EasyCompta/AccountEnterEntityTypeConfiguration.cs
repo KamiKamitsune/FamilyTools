@@ -11,7 +11,6 @@ public class AccountEnterEntityTypeConfiguration : IEntityTypeConfiguration<Acco
         builder.ToTable("AccountEnters");
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Name).IsRequired();
-        builder.Property(e => e.OperationType).IsRequired();
         builder.Property(e => e.TotalValue).IsRequired();
         builder.Property(e => e.Date).IsRequired();
         builder.Property(e => e.IsDisabled).IsRequired();
@@ -33,5 +32,13 @@ public class AccountEnterEntityTypeConfiguration : IEntityTypeConfiguration<Acco
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(e => e.Tag).AutoInclude();
+
+        builder.HasOne(e => e.OperationType)
+            .WithMany()
+            .HasForeignKey("OperationTypeId")
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(e => e.OperationType).AutoInclude();
+
     }
 }

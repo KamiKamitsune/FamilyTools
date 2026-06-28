@@ -5,7 +5,7 @@ namespace FamilyTools.Data.Models.EasyCompta;
 [Table("Templates")]
 public class Template : BaseModel
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public ICollection<AccountEnter> Enters { get; set; } = new List<AccountEnter>();
 

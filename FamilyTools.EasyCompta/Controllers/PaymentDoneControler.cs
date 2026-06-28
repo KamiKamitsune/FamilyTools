@@ -16,31 +16,15 @@ public class PaymentDoneController(IPaymentDoneBusiness paymentDoneBusiness, ILo
     [HttpPatch]
     public async Task<IActionResult> Patch(int id, [FromBody] bool status)
     {
-        try
-        {
-            var paymentDone = await this._business.UpdateStatePaymentDone(id, status);
-            return this.Ok(paymentDone);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest(ex.Message);
-        }
+        var paymentDone = await this._business.UpdateStatePaymentDone(id, status);
+        return this.Ok(paymentDone);
     }
 
     [Route("[action]/{pageId}")]
     [HttpGet]
-    public async Task<IActionResult> getByPageId(int pageId)
+    public async Task<IActionResult> GetByPageId(int pageId)
     {
-        try
-        {
-            var result = await this._business.GetListByPageId(pageId);
-            return this.Ok(result);
-        }
-        catch (Exception ex)
-        {
-            this.logger.LogError(ex.Message);
-            return this.BadRequest(ex.Message);
-        }
+        var result = await this._business.GetListByPageId(pageId);
+        return this.Ok(result);
     }
 }

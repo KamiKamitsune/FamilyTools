@@ -1,0 +1,110 @@
+<section class="account">
+  <header class="account-head">
+    <a class="back-link" routerLink="/">&larr; Portail</a>
+    <h1>Mon compte</h1>
+    @if (username()) {
+      <p class="account-sub">Connecte en tant que <strong>{{ username() }}</strong></p>
+    }
+  </header>
+
+  @if (loading()) {
+    <p class="account-loading">Chargement du profil...</p>
+  } @else {
+    <!-- Informations personnelles -->
+    <form class="card" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <h2>Informations personnelles</h2>
+
+      <label class="field">
+        <span>Prenom</span>
+        <input type="text" formControlName="firstName" autocomplete="given-name" />
+        @if (profileForm.controls.firstName.touched && profileForm.controls.firstName.invalid) {
+          <small class="err">Le prenom est obligatoire.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Nom</span>
+        <input type="text" formControlName="lastName" autocomplete="family-name" />
+        @if (profileForm.controls.lastName.touched && profileForm.controls.lastName.invalid) {
+          <small class="err">Le nom est obligatoire.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" formControlName="email" autocomplete="email" />
+        @if (profileForm.controls.email.touched && profileForm.controls.email.invalid) {
+          <small class="err">Une adresse email valide est requise.</small>
+        }
+      </label>
+
+      <button type="submit" class="btn-primary" [disabled]="savingProfile()">
+        {{ savingProfile() ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </form>
+
+    <!-- Mot de passe -->
+    <form class="card" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <h2>Mot de passe</h2>
+
+      <label class="field">
+        <span>Mot de passe actuel</span>
+        <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+        @if (passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.invalid) {
+          <small class="err">Saisissez votre mot de passe actuel.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Nouveau mot de passe</span>
+        <input type="password" formControlName="newPassword" autocomplete="new-password" />
+        @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('passwordPolicy')) {
+          <small class="err">8 caracteres minimum, avec majuscule, minuscule et caractere special.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Confirmer le nouveau mot de passe</span>
+        <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+        @if (passwordForm.controls.confirmPassword.touched && passwordForm.hasError('mismatch')) {
+          <small class="err">Les deux mots de passe ne correspondent pas.</small>
+        }
+      </label>
+
+      <button type="submit" class="btn-primary" [disabled]="savingPassword()">
+        {{ savingPassword() ? 'Modification...' : 'Changer le mot de passe' }}
+      </button>
+    </form>
+
+    <!-- Double authentification -->
+    <div class="card">
+      <h2>Double authentification (2FA)</h2>
+      <p class="twofa-state">
+        Statut :
+        @if (twoFactorEnabled()) {
+          <span class="badge on">Activee</span>
+        } @else {
+          <span class="badge off">Desactivee</span>
+        }
+      </p>
+      <p class="twofa-help">
+        La 2FA ajoute un code temporaire (application d'authentification) en plus du mot de passe.
+        L'activation se finalise a votre prochaine connexion, sur la page securisee de configuration.
+      </p>
+      <button
+        type="button"
+        class="btn-secondary"
+        [class.danger]="twoFactorEnabled()"
+        [disabled]="savingTwoFactor()"
+        (click)="toggleTwoFactor()">
+        @if (savingTwoFactor()) {
+          Patientez...
+        } @else if (twoFactorEnabled()) {
+          Desactiver la 2FA
+        } @else {
+          Activer la 2FA
+        }
+      </button>
+    </div>
+  }
+</section>

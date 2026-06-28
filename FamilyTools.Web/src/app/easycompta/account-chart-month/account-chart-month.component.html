@@ -1,0 +1,40 @@
+<div class="header">
+  <h1>Diagrammes du mois</h1>
+  <div class="month-selector">
+    <select (change)="changeMonth($event)">
+      @for (date of dateList(); track $index) {
+        <option [value]="date.toISOString()" [selected]="date.getTime() === selectedDate()?.getTime()">
+          {{ date | date: "MMMM yyyy" }}
+        </option>
+      }
+    </select>
+  </div>
+</div>
+
+<div class="navigation-tabs">
+  <div class="tab" routerLink="/easycompta/account-page">Tableau de données</div>
+  <div class="tab" routerLink="/easycompta/account-tag">Tag</div>
+  <div class="tab active">Diagrammes mois</div>
+  <div class="tab" routerLink="/easycompta/account-chart-year">Diagrammes année</div>
+  <div class="tab" routerLink="/user">Membres</div>
+</div>
+
+@if (dateList().length === 0) {
+  <div class="card empty-state">Aucune donnée à afficher pour le moment.</div>
+} @else {
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <h2>Dépenses par catégorie — {{ selectedDate() | date: "MMMM yyyy" }}</h2>
+      <div class="chart-canvas-wrapper">
+        <canvas #tagCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h2>Qui dépense quoi — {{ selectedDate() | date: "MMMM yyyy" }}</h2>
+      <div class="chart-canvas-wrapper">
+        <canvas #userTagCanvas></canvas>
+      </div>
+    </div>
+  </div>
+}

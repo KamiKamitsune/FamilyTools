@@ -1,19 +1,32 @@
-import { Component, inject, isWritableSignal, OnInit, resource, signal } from '@angular/core';
-import { AccountTag } from '../../models/account-tag';
-import { TagFormComponent } from "../../form/tag-form/tag-form.component";
-import { TagService } from '../../service/accountService/tag.service';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AccountTag } from '@easycompta/models/account-tag';
+import { TagFormComponent } from './tag-form/tag-form.component';
+import { AccountTagService } from '@easycompta/data/account-tag.service';
 
 @Component({
   selector: 'app-accounttag',
-  imports: [TagFormComponent],
+  imports: [TagFormComponent, RouterLink],
   templateUrl: './account-tag.component.html',
-  styleUrl: './account-tag.component.css'
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrl: './account-tag.component.css',
 })
-export class AccountTagComponent{
-  
-  readonly service = inject(TagService);
+export class AccountTagComponent {
+  readonly service = inject(AccountTagService);
 
-  deleteTag(id:number){
+  /** Tag en cours d'édition ; `null` => le formulaire est en mode création. */
+  readonly editingTag = signal<AccountTag | null>(null);
+
+  editTag(tag: AccountTag): void {
+    this.editingTag.set(tag);
+  }
+
+  deleteTag(id: number): void {
     this.service.delete(id);
+    if (this.editingTag()?.id === id) this.editingTag.set(null);
+  }
+
+  onSaved(): void {
+    this.editingTag.set(null);
   }
 }

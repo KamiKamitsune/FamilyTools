@@ -23,7 +23,7 @@
       </tr>
       </thead>
       <tbody>
-        @for (user of service.Users(); let i = $index; track user) {
+        @for (user of service.users(); let i = $index; track user) {
           <tr>
             <td>{{ user.id }}</td>
             <td>{{ user.firstName }}</td>

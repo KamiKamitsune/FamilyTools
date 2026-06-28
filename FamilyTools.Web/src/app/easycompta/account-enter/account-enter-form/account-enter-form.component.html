@@ -1,0 +1,136 @@
+<form (submit)="onSubmit($event)">
+  <div class="form-container">
+
+    <div class="form-section">
+
+      <div class="form-group">
+        <label class="form-label required-label">tag</label>
+        <select [formField]="enterForm.tagId" class="form-control">
+          <option [value]="0" disabled>-- choisir un tag --</option>
+          @for (tag of tagService.allTag(); track tag.id) {
+            <option [value]="tag.id">{{ tag.name }}</option>
+          }
+        </select>
+
+        @if (enterForm.tagId().touched() && enterForm.tagId().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.tagId().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required-label">date</label>
+        <input [formField]="enterForm.date" class="form-control" type="date">
+
+        @if (enterForm.date().touched() && enterForm.date().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.date().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required-label">nom</label>
+        <input [formField]="enterForm.name" class="form-control" type="text">
+
+        @if (enterForm.name().touched() && enterForm.name().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.name().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label required-label">type d'opération</label>
+        <select [formField]="enterForm.operationTypeId" class="form-control">
+          <option [value]="0" disabled>-- choisir un type --</option>
+          @for (op of operationTypeService.operationTypes(); track op.id) {
+            <option [value]="op.id">{{ op.name }}</option>
+          }
+        </select>
+
+        @if (enterForm.operationTypeId().touched() && enterForm.operationTypeId().invalid()) {
+          <div class="alert alert-danger">
+            <ul>
+              @for (error of enterForm.operationTypeId().errors(); track error) {
+                <li>{{ error.message }}</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Désactivé</label>
+        <input [formField]="enterForm.isDisabled" type="checkbox">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">montant total (réparti entre les membres)</label>
+        <input [value]="totalValue()" (change)="onTotalChange($event)" class="form-control" type="number">
+      </div>
+
+      <!-- Répartition par membre : éditable, avec redistribution automatique. -->
+      <h3>Répartition</h3>
+      @for (line of lines(); let index = $index; track index) {
+        <div class="form-group">
+          <label class="form-label required-label">utilisateur</label>
+          <select (change)="onLineUserChange(index, $event)" class="form-control">
+            <option value="0" disabled [selected]="line.userId === '0' || line.userId === ''">-- choisir un membre --</option>
+            @for (user of availableUsers(line.userId); track user.id) {
+              <option [value]="user.id" [selected]="+line.userId === user.id">{{ user.userName }}</option>
+            }
+          </select>
+
+          @if (line.userId === '0' || line.userId === '') {
+            <div class="alert alert-danger">
+              <ul>
+                <li>L'utilisateur est requis</li>
+              </ul>
+            </div>
+          }
+
+          <label class="form-label required-label">Valeur</label>
+          <input [value]="line.value" (change)="onLineValueChange(index, $event)" class="form-control" type="number">
+
+          <button (click)="removeLine(index)" class="btn btn-secondary" type="button">
+            Retirer
+          </button>
+        </div>
+      }
+
+      <button (click)="addLine()" [disabled]="!canAddLine()" class="btn btn-secondary" type="button">
+        + Ajouter une ligne
+      </button>
+
+      <div class="form-group">
+        <label class="form-label">total réparti</label>
+        <output class="form-control">{{ distributedTotal() | number: '1.2-2' }} €</output>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" type="submit">
+      @if (isEdit()) {
+        Modifier l'écriture
+      } @else {
+        Ajouter l'écriture
+      }
+    </button>
+  </div>
+</form>

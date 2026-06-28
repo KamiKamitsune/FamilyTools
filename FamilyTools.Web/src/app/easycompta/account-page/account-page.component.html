@@ -1,26 +1,24 @@
 <div class="header">
   <h1>Tableau de Bord Comptable</h1>
   <div class="month-selector">
-    <!-- <button class="btn btn-secondary">&lt;</button>      -->
     <select (change)="changePages($event)">
-
-      @for (date of date_list; track $index) {
-      @if (date.getMonth() == this.last_date.getMonth() && date.getFullYear() == this.last_date.getFullYear()) {
-      <option selected value="{{ date }} ">{{ date | date : "MMMM yyyy"}}</option>
-      }@else {
-      <option value="{{ date }}">{{ date | date : "MMMM yyyy"}}</option>
+      @for (date of dateList(); track $index) {
+        @if (date.getMonth() == lastDate().getMonth() && date.getFullYear() == lastDate().getFullYear()) {
+          <option selected value="{{ date }}">{{ date | date : "MMMM yyyy" }}</option>
+        } @else {
+          <option value="{{ date }}">{{ date | date : "MMMM yyyy" }}</option>
+        }
       }
-      }
-
     </select>
-    <!-- <button class="btn btn-secondary">&gt;</button> -->
   </div>
 </div>
 
 <div class="navigation-tabs">
   <div class="tab active">Tableau de données</div>
-  <div class="tab" routerLink="/easycompta/account-tag"> Tag </div>
-  <div class="tab">Diagrammes</div>
+  <div class="tab" routerLink="/easycompta/account-tag">Tag</div>
+  <div class="tab" routerLink="/easycompta/account-chart-month">Diagrammes mois</div>
+  <div class="tab" routerLink="/easycompta/account-chart-year">Diagrammes année</div>
+  <div class="tab" routerLink="/user">Membres</div>
 </div>
 
 <div class="card">
@@ -28,35 +26,27 @@
     <div class="filter-section">
       <div class="filter-control">
         <label>Catégorie:</label>
-        <select>
+        <select (change)="onTagFilterChange($event)">
           <option value="">Toutes</option>
-          @for (tag of this.current_tags; track $index) {
-          <option value="{{ tag.id }}">{{ tag.name }}</option>
+          @for (tag of tagService.allTag(); track tag.id) {
+            <option [value]="tag.id">{{ tag.name }}</option>
           }
         </select>
       </div>
       <div class="filter-control">
         <label>Personne:</label>
-        <!-- <select>
+        <select (change)="onUserFilterChange($event)">
           <option value="">Toutes</option>
-          @for (user of this.current_page?.getUsers(); track $index) {
-          <option value="{{ user.id }}">{{ user.userName }}</option>
+          @for (user of userService.users(); track user.id) {
+            <option [value]="user.id">{{ user.userName }}</option>
           }
-        </select> -->
-      </div>
-      <div class="filter-control">
-        <label>Statut:</label>
-        <select>
-          <option value="">Tous</option>
-          <!-- <option value="payé">Payé</option>
-          <option value="en attente">En attente</option> -->
         </select>
       </div>
     </div>
     <div class="action-buttons">
       <button class="btn btn-primary" routerLink="/easycompta/account-enter"> + Ajouter une entrée</button>
       <input #addCsvButton type="file" accept=".csv" (change)="onFileSelected($event)">
-      <button (click)="uploadFile()" [disabled]="!selectedFile">
+      <button (click)="uploadFile()" [disabled]="!selectedFile()">
         Envoyer CSV
       </button>
     </div>
@@ -75,14 +65,15 @@
     </tr>
     </thead>
     <tbody>
-      @for (enter of current_page?.enters; track $index) {
+      @for (enter of filteredEnters(); track enter.id) {
         <tr>
-          <td>{{ operationtype[enter.operationType] }}</td>
+          <td>{{ enter.operationType.name }}</td>
           <td>{{ enter.name }}</td>
           <td>
-            <span class="tag-icon">⚡</span>
+            <span class="tag-icon" [style.background-color]="enter.tag.color"></span>
+            {{ enter.tag.name }}
           </td>
-          <td class="numeric-value">{{ enter.totalValue }} €</td>
+          <td class="numeric-value">{{ enter.totalValue | number: '1.2-2' }} €</td>
           <td>
             <div class="assignee-list">
               @for (line of enter.lines; let last = $last; track line) {
@@ -102,7 +93,7 @@
               <span class="toggle-slider"></span>
             </label>
           </td>
-          <td> {{ enter.date }}</td>
+          <td>{{ enter.date | date: 'dd/MM/yyyy' }}</td>
           <td>
             <div class="row-actions">
               <a routerLink="/easycompta/account-enter/{{ enter.id }}">
@@ -110,13 +101,12 @@
                   <span class="action-icon">✏️</span>
                 </button>
               </a>
-              <button type="button">
+              <button (click)="deleteEnter(enter.id!)" type="button">
                 <span class="action-icon">🗑️</span>
               </button>
             </div>
           </td>
         </tr>
-        <tr>
       }
     </tbody>
   </table>
@@ -125,12 +115,12 @@
 <h2>Récapitulatif par personne</h2>
 <div class="summary-section">
 
-  @for (payment_done of this.current_page?.paymentDones; track $index) {
+  @for (payment_done of currentPage()?.paymentDones; track $index) {
   <div class="summary-card">
     <div class="summary-header">
       <h3>{{ payment_done.user.userName }}</h3>
     </div>
-    <div class="summary-amount">{{ payment_done.total }}</div>
+    <div class="summary-amount">{{ payment_done.total | number: '1.2-2' }} €</div>
     <div class="summary-status">
       <span>Mois payé :</span>
       <label class="toggle-switch">

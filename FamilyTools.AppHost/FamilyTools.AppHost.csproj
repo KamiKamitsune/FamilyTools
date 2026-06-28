@@ -9,31 +9,45 @@
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
     <UserSecretsId>45379698-1964-439f-85aa-f1a86fffa672</UserSecretsId>
+    <!-- WithoutHttpsCertificate() est une API Aspire encore marquee "experimentale"
+         (diagnostic ASPIRECERTIFICATES001). On l'autorise volontairement : elle garde
+         Keycloak en HTTP simple sur 8080 en dev (cf. Program.cs). -->
+    <NoWarn>$(NoWarn);ASPIRECERTIFICATES001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FamilyTools.BackgroundService\FamilyTools.BackgroundService.csproj" />
     <ProjectReference Include="..\FamilyTools.EasyCompta\FamilyTools.EasyCompta.csproj" />
+	<ProjectReference Include="..\FamilyTools.Accounts\FamilyTools.Accounts.csproj" />
 	<ProjectReference Include="..\FamilyTools.Data\FamilyTools.Data.csproj" />
 	<ProjectReference Include="..\FamilyTools.MigrationService\FamilyTools.MigrationService.csproj" />
+	<ProjectReference Include="..\FamilyTools.CsvWorker\FamilyTools.CsvWorker.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.2.0" />
-    <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.2.0" />
-    <PackageReference Include="Aspire.Hosting.Redis" Version="13.2.0" />
-    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.2.0" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.4.3" />
+    <PackageReference Include="Aspire.Hosting.Docker" Version="13.4.3" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.4.3" />
+    <PackageReference Include="Aspire.Hosting.Keycloak" Version="13.4.3-preview.1.26305.13" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.4.3" />
+    <PackageReference Include="Aspire.Hosting.Redis" Version="13.4.3" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.4.3" />
     <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.9.0" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="18.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
+    <PackageReference Include="MessagePack" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.7.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
   </ItemGroup>
 
-	<Target Name="RestoreNpm" BeforeTargets="Build" Condition=" '$(DesignTimeBuild)' != 'true' ">
+	<!-- SkipNpmRestore=true permet a la CI back (image SDK .NET sans Node) de compiler
+	     l'AppHost sans declencher 'npm install'. Le front a ses propres jobs CI. -->
+	<Target Name="RestoreNpm" BeforeTargets="Build" Condition=" '$(DesignTimeBuild)' != 'true' AND '$(SkipNpmRestore)' != 'true' ">
 		<ItemGroup>
 			<PackageJsons Include="..\*\package.json" />
 		</ItemGroup>

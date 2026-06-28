@@ -1,0 +1,75 @@
+/*
+ * Habillage FamilyTools des pages de connexion Keycloak (login, OTP, reinitialisation).
+ * Palette alignee sur le portail : indigo (#3f51b5 / #303f9f) et accent rose (#ff4081).
+ * On surcharge le theme classique "keycloak" via des selecteurs stables.
+ */
+
+:root {
+  --ft-primary: #3f51b5;
+  --ft-primary-dark: #303f9f;
+  --ft-primary-light: #7986cb;
+  --ft-accent: #ff4081;
+}
+
+/* Fond de page degrade aux couleurs de la marque. */
+.login-pf body,
+body.login-pf-page,
+.login-pf-page {
+  background: linear-gradient(135deg, var(--ft-primary-dark) 0%, var(--ft-primary) 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* En-tete : nom FamilyTools en blanc, bien lisible sur le degrade. */
+#kc-header-wrapper {
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 24px 0;
+  text-transform: none;
+}
+
+/* Carte de connexion : coins arrondis, ombre douce, liseré accent en haut. */
+.login-pf-page .card-pf {
+  border-top: 4px solid var(--ft-accent);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  padding: 28px 32px 32px;
+}
+
+/* Boutons principaux (Se connecter, Enregistrer...). */
+.btn-primary {
+  background: var(--ft-primary) !important;
+  border-color: var(--ft-primary) !important;
+  font-weight: 500;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: var(--ft-primary-dark) !important;
+  border-color: var(--ft-primary-dark) !important;
+}
+
+/* Champs : focus aux couleurs de la marque. */
+.form-control:focus {
+  border-color: var(--ft-primary-light);
+  box-shadow: 0 0 0 0.15rem rgba(121, 134, 203, 0.45);
+}
+
+/* Liens (mot de passe oublie, etc.). */
+a,
+#kc-registration a,
+#kc-info-message a {
+  color: var(--ft-primary);
+}
+
+a:hover {
+  color: var(--ft-primary-dark);
+}
+
+/* Case "Se souvenir de moi" et libelles. */
+#kc-form-options label,
+.login-pf-page .login-pf-header h1 {
+  color: var(--ft-primary-dark);
+}

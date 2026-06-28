@@ -1,17 +1,13 @@
-import { Component, Injectable, OnInit, inject } from '@angular/core';
-import { AccountPage } from '../models/account-page';
-import { HttpClient } from '@angular/common/http';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
-@Injectable()
 @Component({
   selector: 'app-easycompta',
-  standalone: true,
+  imports: [RouterOutlet],
   templateUrl: './easycompta.component.html',
   styleUrl: './easycompta.component.css',
-  imports: [RouterOutlet],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EasycomptaComponent{
-
+export class EasycomptaComponent {
   title = 'EasyCompta';
 }
